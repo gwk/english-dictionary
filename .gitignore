@@ -1,0 +1,9 @@
+# python.
+*.pyc
+
+# osx.
+.DS_Store
+
+# project.
+_build/
+_misc/
