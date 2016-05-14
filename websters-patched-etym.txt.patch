@@ -1,0 +1,158 @@
+diff --git _build/websters-patched-structure.txt _build/websters-patched-etym.txt
+index 049c2eb..9c7772b 100644
+--- _build/websters-patched-structure.txt
++++ _build/websters-patched-etym.txt
+@@ -22280,7 +22280,7 @@ ALEWIFE
+ Ale"wife`, n.; pl. Alewives. Etym: [This word is properly aloof, the
+ Indian name of a fish. See Winthrop on the culture of maize in
+ America, "Phil Trans." No. 142, p. 1065, and Baddam's "Memoirs," vol.
+-ii. p. 131.]Etym: (Zoöl.)
++ii. p. 131.] (Zoöl.)
+ 
+ Defn: A North American fish (Clupea vernalis) of the Herring family.
+ It is called also ellwife, ellwhop, branch herring. The name is
+@@ -22692,7 +22692,7 @@ Simpson.
+ 
+ ALIAS
+ A"li*as, n.; pl. Aliases. Etym: [L., otherwise, at another
+-time.]Etym: (Law)
++time.] (Law)
+ (a) A second or further writ which is issued after a first writ has
+ expired without effect.
+ (b) Another name; an assumed name.
+@@ -46645,8 +46645,8 @@ Gr.
+ 2. A great magician, wizard, or enchanter. Spenser.
+ 
+ ARCHIMANDRITE
+-Ar`chi*man"drite, n. Etym: [L. archimandrita, LGr. arch-) + (Gr.
+-Church)
++Ar`chi*man"drite, n. Etym: [L. archimandrita, (LGr. arch-) + (Gr.
++Church)]
+ (a) A chief of a monastery, corresponding to abbot in the Roman
+ Catholic church.
+ (b) A superintendent of several monasteries, corresponding to
+@@ -46695,12 +46695,12 @@ Minor. It is studded with a vast number of small islands.
+ islands or with a group of islands.
+ 
+ ARCHIPTERYGIUM
+-Ar*chip`te*ryg"i*um, n. Etym: [NL., fr. Gr. pref. arch-) + (Anat.)
++Ar*chip`te*ryg"i*um, n. Etym: [NL., (fr. Gr. pref. arch-) + (Anat.)]
+ 
+ Defn: The primitive form of fin, like that of Ceratodus.
+ 
+ ARCHITECT
+-Ar"chi*tect, n. Etym: [L. architectus, architecton, Gr. archi-) +
++Ar"chi*tect, n. Etym: [L. architectus, architecton, (Gr. archi-) +
+ architecte, It. architetto. See Technical.]
+ 
+ 1. A person skilled in the art of building; one who understands
+@@ -132457,7 +132457,7 @@ Cat`e*lec`tro*ton"ic, a. (Physics)
+ Defn: Relating to, or characterized by, catelectrotonus.
+ 
+ CATELECTROTONUS
+-Cat`e*lec*trot"o*nus, n. Etym: [NL., fr. Gr. Electro-) + (Physics)
++Cat`e*lec*trot"o*nus, n. Etym: [NL., (fr. Gr. Electro-) + (Physics)]
+ 
+ Defn: The condition of increased irritability of a nerve in the
+ region of the cathode or negative electrode, on the passage of a
+@@ -239366,7 +239366,7 @@ Syn.
+  -- Darkness; obscurity; gloom. See Darkness.
+ 
+ DIMORPH
+-Di"morph`, n. Etym: [Gr. Di-) + (Crystallog.)
++Di"morph`, n. Etym: [(Gr. Di-) + (Crystallog.)]
+ 
+ Defn: Either one of the two forms of a dimorphous substance; as,
+ calcite and aragonite are dimorphs.
+@@ -294970,7 +294970,7 @@ purpose of removing any foreign substance that obstructs the passage.
+ [Written also oesophagotomy.]
+ 
+ ESOPHAGUS
+-E*soph"a*gus, n. Etym: [NL., fr. Gr. vi to go, drive) + (Anat.)
++E*soph"a*gus, n. Etym: [NL., (fr. Gr. vi to go, drive) + (Anat.)]
+ 
+ Defn: That part of the alimentary canal between the pharynx and the
+ stomach; the gullet. See Illust. of Digestive apparatus, under
+@@ -347479,7 +347479,7 @@ Defn: Lightning. [Obs.]
+ 
+ FULHAM
+ Ful"ham, n. Etym: [So named because supposed to have been chiefly
+-made at Fulham, in Middlesex, Eng.)
++made at Fulham, in Middlesex, Eng.]
+ 
+ Defn: A false die. [Cant] [Written also fullam.] Shak.
+ 
+@@ -357094,7 +357094,7 @@ Defn: To investigate, or relate the history of, descents.
+ 
+ GENEALOGY
+ Gen`e*al"o*gy, n.; pl. Genealogies. Etym: [OE. genealogi, genelogie,
+-OF. genelogie, F. généalogie, L. genealogia, fr. Gr. genus) +
++OF. genelogie, F. généalogie, L. genealogia, fr. Gr. genus]
+ 
+ 1. An account or history of the descent of a person or family from an
+ ancestor; enumeration of ancestors and their children in the natural
+@@ -384167,7 +384167,7 @@ Defn: A hook, or hooklike process.
+ Defn: A hooked barbicel of a feather.
+ 
+ HAN
+-Han, Etym: contr. inf. & plural pres. of Haven.
++Han, Etym: [contr. inf. & plural pres. of Haven.]
+ 
+ Defn: To have; have. [Obs.] Piers Plowman.
+ Him thanken all, and thus they han an end. Chaucer.
+@@ -390813,7 +390813,7 @@ chemical action; as, green hay heats in a mow, and manure in the
+ dunghill.
+ 
+ HEAT
+-Heat, Etym: imp. & p. p. of Heat.
++Heat, Etym: [imp. & p. p. of Heat.]
+ 
+ Defn: Heated; as, the iron though heat red-hot. [Obs. or Archaic.]
+ Shak.
+@@ -397624,7 +397624,7 @@ Hex"a*dec`ane, n. (Chem.)
+ Defn: See Hecdecane.
+ 
+ HEXAGON
+-Hex"a*gon, n. Etym: [L. hexagonum, Gr. six) + (Geom.)
++Hex"a*gon, n. Etym: [L. hexagonum, (Gr. six) + (Geom.)]
+ 
+ Defn: A plane figure of six angles. Regular hexagon, a hexagon in
+ which the angles are all equal, and the sides are also all equal.
+@@ -571679,7 +571679,7 @@ Nu*mis"ma*tist, n.
+ Defn: One skilled in numismatics; a numismatologist.
+ 
+ NUMISMATOGRAPHY
+-Nu*mis`ma*tog"ra*phy, n. Etym: [L. numisma, -atis (Gr. -graphy.]
++Nu*mis`ma*tog"ra*phy, n. Etym: [L. numisma, -atis (Gr. -graphy).]
+ 
+ Defn: A treatise on, or description of, coins and medals.
+ 
+@@ -673345,7 +673345,7 @@ of certain Turbellaria. They are filled with a soft granular
+ substance.
+ 
+ PSEUDO-ROMANTIC
+-Pseu`do-ro*man"tic, a. Etym: Pseudo- + romantic.]
++Pseu`do-ro*man"tic, a. Etym: [Pseudo- + romantic.]
+ 
+ Defn: Falsely romantic.
+ The false taste, the pseudo-romantic rage. De Quincey.
+@@ -820826,8 +820826,8 @@ Defn: To die, or cause to die; to perish. See Starve. [Obs.] Chaucer.
+ Spenser.
+ 
+ STET
+-Stet, Etym: L., subj. 3d pers. sing. of stare to stand, remain. Etym:
+-[See Stand.] (Print.)
++Stet, Etym: [L., subj. 3d pers. sing. of stare to stand, remain.
++See Stand.] (Print.)
+ 
+ Defn: Let it stand; -- a word used by proof readers to signify that
+ something once erased, or marked for omission, is to remain.
+@@ -914723,7 +914723,7 @@ U`ni*va"ri*ant, a. (Chem.)
+ Defn: Having one degree of freedom or variability.
+ 
+ UNIVERSAL
+-U`ni*ver"sal, a. Etym: Etym: [L. universalis: cf. F. universel, OF.
++U`ni*ver"sal, a. Etym: [L. universalis: cf. F. universel, OF.
+ also universal. See Universe.]
+ 
+ 1. Of or pertaining to the universe; extending to, including, or

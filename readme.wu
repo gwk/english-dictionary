@@ -1,0 +1,30 @@
+# Motivation
+
+This is a toy data science project intended to test muck. I chose it mostly to satisfy a longstanding curiosity about the nature of natural languages: what is the subset of words in the english dictionary that are circularly defined?
+
+
+# Experience
+
+## Data
+
+There are a variety of search results on the Project Gutenberg website for the search terms "webster's dictionary". The entry I chose, '29765.txt.utf-8', was the only one I could find that was complete, had properly encoded utf8 characters (others have had characters replaced with '?'), and did not contain garbage html tags.
+
+## First Stage
+
+I have written line-oriented parsers in the past that use an explicit state transition pattern, and so this was a natural first approach for me. The main realization during the first stage was to back away from transformations that lose information, such as collapsing multiple entries with matching pronunciation lines, as these appear to indicate the degree of relatedness between multiple definition blocks.
+
+The other early challenge was to decide on some terminology: an 'entry' is a 'name' followed by the 'grammar' line, which contains pronunciation, etymology, and topic information. This is followed by one or more 'definition' lines.
+
+## Second Stage
+
+I quickly became obsessed with trying to parse the grammar lines, even though they are somewhat tangential to the main goal of analyzing the word sets from the definitions. It's an interesting problem for several reasons:
+- Despite being fairly structured, the grammar of the 'grammar' lines appears to be fuzzy/inconsistent at a conceptual level.
+- Additionally, there appear to be some typos in various lines (not sure if the distinction between these two points is legitimate or not).
+- Some of the lines aren't even so easy for a human (or at least me) to read!
+
+My first parsing attempt with regular expressions failed miserably, due to the presence of parenthetical comments that themselves contain periods. This made sentence-by-sentence scanning impossible.
+
+My second attempt was a simple parsing function that splits the string into words, and recognizes parentheses and brackets as subtrees. It's a weird approach in that it essentially lexes and parses in one step, but then requires post-processing that would normally be done within the parsing step, e.g. turning the sequence of positional and optional elements into a proper struct of labeled fields.
+
+
+
