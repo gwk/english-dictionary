@@ -25,6 +25,9 @@ known_excluded_names = {'M.', 'P.', 'X.'}
 known_empty_gram = known_excluded_names.union(
   {'B', 'C', 'D', 'E', 'G', 'H', 'I', 'J', 'K', 'L', 'N', 'O', 'Q', 'S', 'U', 'V', 'W', 'Y'})
 
+punctuation_escape_re = re.compile(r' \(([][()/.,; ])')
+
+
 # parser is a simple state-machine.
 state_names = (
   'none',
@@ -50,9 +53,8 @@ gram = None
 defn_lines = []
 defns = []
 
-# the global result data structure is a dictionary of names to lists of pairs;
-# each pair consists of a grammar string and a list of definition strings.
-records = defaultdict(list)
+# records is a list of triples: (name, technical, [definitions]).
+records = []
 
 # parsing main loop.
 for (line_num, line_raw) in enumerate(text):
@@ -86,7 +88,8 @@ for (line_num, line_raw) in enumerate(text):
       error("empty record")
     if name in known_excluded_names:
       return
-    records[name].append((gram, defns))
+    tech = punctuation_escape_re.sub(lambda m: m.group(1), gram)
+    records.append([name, tech, defns])
     name = None # cleared here just for clarity of the state machine.
     gram = None # " ".
     defns = []
@@ -135,7 +138,7 @@ for (line_num, line_raw) in enumerate(text):
       gram = line
 
   elif prev_state == s_gram:
-    if re.match(r'\([a-z]\)', line):
+    if re.match(r'\s*\([a-z]\)', line):
       #note('missing blank between grammar and definition')
       state = s_defn
     else:
@@ -143,7 +146,7 @@ for (line_num, line_raw) in enumerate(text):
       gram += ' ' + line
 
   elif prev_state == s_defn:
-    if re.match(r'\([a-z]\)', line):
+    if re.match(r'\s*(\([a-z]\)|--)', line):
       flush_defn()
     state = s_defn
 
@@ -168,4 +171,4 @@ for (line_num, line_raw) in enumerate(text):
 flush_record()
 
 errFL('writing {} records', len(records))
-json.dump(sorted(records.items()), sys.stdout, indent=2, sort_keys=True)
+json.dump(records, sys.stdout, indent=2)
