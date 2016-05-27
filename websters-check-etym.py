@@ -2,9 +2,7 @@
 import muck
 
 from pithy import *
-from pithy.nestparser import NestParser
 
-parser = NestParser()
 
 records = muck.source('websters-scanned.json')
 
@@ -13,11 +11,8 @@ for name, entries in records:
   for entry_text, defn_strings in entries:
     cost, entry_tree = parser.parse(entry_text)
     
-    def warnF(fmt, *items):
-      errL(name)
-      errL('  ', entry_text)
-      errL('  ', entry_tree)
-      errFL('  ' + fmt, *items)
+    def warn_entry(fmt, *items):
+      errFL('{}\n  {}\n  {}\n  ' + fmt, name, entry_text, entry_tree, *items)
 
     expect_etym = False
     etym = None
@@ -33,11 +28,11 @@ for name, entries in records:
         if words[-1] == 'Etym:':
           expect_etym = True
         elif 'Etym:' in words:
-          errFL('etym label is out of place: {!r}', el)
+          warn_entry('etym label is out of place: {!r}', el)
       else: # el is delimited tuple.
         if expect_etym:
           etym = el[1:-1]
           expect_etym = False
           if el[0] != '[' or el[-1] != ']':
-            warnF('weird etym delimiters: {}', etym)
+            warn_entry('weird etym delimiters: {}', etym)
 

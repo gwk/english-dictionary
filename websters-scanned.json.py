@@ -14,7 +14,7 @@ import json
 from pithy import *
 
 
-text = muck.source('websters-patched-etym.txt')
+text = muck.source('websters-p2-etym.txt')
 
 
 # parsing is primarily based on recognizing dictionary entries as capitalized words.
@@ -26,6 +26,14 @@ known_empty_gram = known_excluded_names.union(
   {'B', 'C', 'D', 'E', 'G', 'H', 'I', 'J', 'K', 'L', 'N', 'O', 'Q', 'S', 'U', 'V', 'W', 'Y'})
 
 punctuation_escape_re = re.compile(r' \(([][()/.,; ])')
+dangling_paren_re = re.compile(r'(\([^][();,-]+)(\]|$)')
+
+def fix_tech(tech):
+  'apply various fixes to the technical line.'
+  tech = punctuation_escape_re.sub(lambda m: m.group(1), tech)
+  tech = tech.rstrip(' (') # lots of trailing open-parens.
+  tech = dangling_paren_re.sub(lambda m: m.group(1) + ')]', tech)
+  return tech
 
 
 # parser is a simple state-machine.
@@ -88,7 +96,7 @@ for (line_num, line_raw) in enumerate(text):
       error("empty record")
     if name in known_excluded_names:
       return
-    tech = punctuation_escape_re.sub(lambda m: m.group(1), gram)
+    tech = fix_tech(gram) # TODO: rename gram everywhere.
     records.append([name, tech, defns])
     name = None # cleared here just for clarity of the state machine.
     gram = None # " ".
