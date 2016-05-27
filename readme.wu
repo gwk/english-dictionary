@@ -1,6 +1,11 @@
 # Motivation
 
-This is a toy data science project intended to test muck. I chose it mostly to satisfy a longstanding curiosity about the nature of natural languages: what is the subset of words in the english dictionary that are circularly defined?
+This is a toy data science project intended to test Muck, a build tool for data analysis (see github.com/gwk/muck). I chose it mostly to satisfy a longstanding curiosity about the nature of natural languages: what is the subset of words in the english dictionary that are circularly defined?
+
+I started with the Project Gutenberg version of Webster's Unabridged Dictionary, which I first learned about from James Somers' blog (http://jsomers.net/blog/dictionary). I chose this text as a starting point for several reasons:
+- it is in the public domain;
+- Somers promoted it as being more interesting to read than modern dictionaries;
+- the raw text presents several non-trivial data cleaning challenges.
 
 
 # Experience
