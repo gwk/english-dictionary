@@ -2,12 +2,16 @@
 import re
 
 from pithy import *
+from pithy.ansi import *
+
 
 nest_pairs = {
   '(' : ')',
   '[' : ']',
   '{' : '}'
 }
+
+nest_closers = frozenset(nest_pairs.values())
 
 def lex_leaf(text):
   return text.split()
@@ -23,32 +27,73 @@ def parse_nest(text):
   seq = lex_body(text)
   res = []
   pos = 0
-  res, pos = _parse_nest(seq, pos=0, depth=0, opener=None, closer=None)
-  assert pos == len(seq)
-  return res
+  while pos < len(seq):
+    t = seq[pos]
+    try: # opener?
+      closer = nest_pairs[t]
+    except KeyError: # not opener.
+      res.extend(lex_leaf(t))
+      pos += 1
+    else: # opener.
+      sub, pos = _parse_nest_sub(seq, pos=pos+1, depth=1, opener=t, closer=closer)
+      res.append(sub)
+  return tuple(res)
 
-def _parse_nest(seq, pos, depth, opener, closer):
-  res = [opener] if depth > 0 else []
+def _parse_nest_sub(seq, pos, depth, opener, closer):
+  res = [opener]
   while pos < len(seq):
     t = seq[pos]
     if t == closer:
       res.append(t)
       return tuple(res), (pos + 1)
+    if t in nest_closers: # unexpected closer; always a flaw.
+      res.append('ø')
+      return tuple(res), pos
     try:
       sub_closer = nest_pairs[t]
     except KeyError: # regular token; simply advance.
       res.extend(lex_leaf(t))
       pos += 1
-      continue
     else: # found opener.
-      sub_res, pos = _parse_nest(seq, pos=pos+1, depth=depth+1, opener=t, closer=sub_closer)
-      res.append(sub_res)
+      sub, pos = _parse_nest_sub(seq, pos=pos+1, depth=depth+1, opener=t, closer=sub_closer)
+      res.append(sub)
   assert pos == len(seq)
-  if depth > 0: # missing closer. auto-repair at the top level only.
-    res.append(closer if (depth == 1) else 'ø')
+  # missing closer at end of seq. auto-repair at the top level only.
+  res.append(closer if (depth == 1) else 'ø')
   return tuple(res), pos
 
-def is_tree_flawed(tree):
+
+def _is_tree_flawed(tree):
   if is_str(tree):
     return tree == 'ø'
-  return any(is_tree_flawed(t) for t in tree)
+  return any(_is_tree_flawed(t) for t in tree)
+
+def is_tree_flawed(tree):
+  return any(_is_tree_flawed(el) for el in tree)
+
+
+_magenta_null = BG_M + 'ø' + RST
+
+def _desc_for_tree(tree):
+  if is_str(tree):
+    if tree in nest_closers: return '{}{}{}'.format(BG_R, tree, RST)
+    return tree
+  assert len(tree) >= 2
+  closer = tree[-1]
+  return '{}{}{}'.format(
+    tree[0],
+    ' '.join(_desc_for_tree(el) for el in tree[1:-1]),
+    _magenta_null if closer == 'ø' else closer)
+
+
+def desc_for_tree(tree):
+  assert is_tuple(tree)
+  return ' '.join(_desc_for_tree(el) for el in tree)
+
+
+def is_bracket_tree(tree):
+  return is_tuple(tree) and tree and tree[0] == '['
+
+def is_paren_tree(tree):
+  return is_tuple(tree) and tree and tree[0] == '('
+

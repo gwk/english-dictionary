@@ -13,7 +13,7 @@ import json
 from pithy import *
 
 
-text = muck.source('websters-p2-etym.txt')
+text = muck.source('websters-p3-misc.txt')
 
 
 # parsing is primarily based on recognizing dictionary entries as capitalized words.
@@ -27,12 +27,23 @@ known_empty_gram = known_excluded_names.union(
 punctuation_escape_re = re.compile(r' \(([][()/.,; ])')
 dangling_paren_re = re.compile(r'(\([^][();,-]+)(\]|$)')
 
+remove_various_re = re.compile('|'.join(re.escape(text) for text in [
+  '{', '}', # manually reviewed; braces occur in only a few places and serve no useful purpose.
+]))
+
+
 def fix_tech(tech):
   'apply various fixes to the technical line.'
   tech = punctuation_escape_re.sub(lambda m: m.group(1), tech)
   tech = tech.rstrip(' (') # lots of trailing open-parens.
   tech = dangling_paren_re.sub(lambda m: m.group(1) + ')]', tech)
+  tech = remove_various_re.sub('', tech)
   return tech
+
+
+def fix_defn(defn):
+  defn = remove_various_re.sub('', defn)
+  return defn
 
 
 # parser is a simple state-machine.
@@ -83,8 +94,9 @@ for (line_num, line_raw) in enumerate(text):
     exit(1)
 
   def flush_defn():
-    global defn_lines
-    defns.append(' '.join(defn_lines)) # have to be careful not to alias defn_lines anywhere else.
+    global defn_lines # have to be careful not to alias defn_lines anywhere else.
+    defn = fix_defn(' '.join(defn_lines))
+    defns.append(defn)
     defn_lines = []
 
   def flush_record():

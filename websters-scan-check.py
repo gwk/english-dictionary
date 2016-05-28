@@ -17,16 +17,15 @@ defn_issues = 0
 
 def check_record(name, tech, defns):
 
+  tech_tree = parse_nest(tech)
+
   def warn_tech(fmt, *items):
     global tech_issues
     tech_issues += 1
-    errFL('\n{}:\n  {!r}\n  ' + fmt, name, tech, *items)
+    errFL('\ntech: {}:\n  {}\n  {}\n  ' + fmt, name, tech, desc_for_tree(tech_tree), *items)
 
-  if not tech:
+  if not tech_tree:
     warn_tech('empty')
-
-  if tech.strip() != tech:
-    warn_tech('whitespace')
 
   # there appears to be a character escaping scheme of the form ' (…'.
   # this check caught the most obvious ones; the fix is applied in fix_tech().
@@ -36,7 +35,8 @@ def check_record(name, tech, defns):
   m = re.search(r' \(([^-=#`"0-9a-zA-Zäéêôü])', tech)
   if m: warn_tech('paren punctuation: {!r}', m.group(1))
 
-  tech_tree = parse_nest(tech)
+  if re.search('[{}]', tech):
+    warn_tech('braces')
 
   if is_tree_flawed(tech_tree):
     warn_tech('flawed tech tree')
@@ -45,11 +45,14 @@ def check_record(name, tech, defns):
     warn_tech('empty defns')
 
   for defn in defns:
-    def warn(fmt, *items):
+    def warn_defn(fmt, *items):
       global defn_issues
       defn_issues += 1
-      errFL('\n{}:\n  {!r}\n  ' + fmt, name, defn, *items)
-
+      errFL('\ndefn: {}:\n  {!r}\n  ' + fmt, name, defn, *items)
+    for c in defn:
+      if c in '{}':
+        warn_defn('braces')
+        break
   
 for r in records:
   check_record(*r)
