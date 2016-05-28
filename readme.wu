@@ -1,35 +1,68 @@
 # Motivation
 
-This is a toy data science project intended to test Muck, a build tool for data analysis (see github.com/gwk/muck). I chose it mostly to satisfy a longstanding curiosity about the nature of natural languages: what is the subset of words in the english dictionary that are circularly defined?
+This is a toy data science project intended to test Muck, a build tool for data analysis (see github.com/gwk/muck). I chose it mostly to satisfy a longstanding curiosity about the nature English dictionaries: what is the subset of words in the dictionary that are circularly defined?
 
 I started with the Project Gutenberg version of Webster's Unabridged Dictionary, which I first learned about from James Somers' blog (http://jsomers.net/blog/dictionary). I chose this text as a starting point for several reasons:
 - it is in the public domain;
 - Somers promoted it as being more interesting to read than modern dictionaries;
 - the raw text presents several non-trivial data cleaning challenges.
 
+# Terminology
+
+For clarity, I came up with a few terms for clarity in the code and documentation:
+- 'raw line': a line of text from the original document, which had line breaks inserted to wrap at 78 characters (typical of older text produced for viewing on 80 character terminals).
+- 'logical line', 'line': a line of text created during the 'scan' step by grouping and joining one or more raw lines.
+- 'entry': conceptually, a record within the dictionary, consisting of the 'name', 'technical line', and 'definitions'. There are many entries with non-unique names in the Webster's text.
+- 'name': within an entry, the name is the word being defined.
+- 'technical line', 'tech': the logical line in an entry immediately following the name. This line contains the pronunciation, part of speech, etymology, and topic information.
+- 'definition', 'defn': a 
 
 # Experience
 
 ## Data
 
-There are a variety of search results on the Project Gutenberg website for the search terms "webster's dictionary". The entry I chose, '29765.txt.utf-8', was the only one I could find that was complete, had properly encoded utf8 characters (others have had characters replaced with '?'), and did not contain garbage html tags.
+There are a variety of search results on the Project Gutenberg website for the search terms "webster's dictionary". The entry I chose, '29765.txt.utf-8', was the only one I could find that was complete, had properly encoded utf8 characters (others have had characters replaced with '?'), and did not contain html tags. The html versions that I found have had rudimentary tags automatically inserted into the wrapped plaintext, and thus do not provide any real semantic information that could be used during parsing.
 
-## First Stage
 
-I have written line-oriented parsers in the past that use an explicit state transition pattern, and so this was a natural first approach for me. The main realization during the first stage was to back away from transformations that lose information, such as collapsing multiple entries with matching pronunciation lines, as these appear to indicate the degree of relatedness between multiple definition blocks.
+## First Stage: Scan
 
-The other early challenge was to decide on some terminology: an 'entry' is a 'name' followed by the 'grammar' line, which contains pronunciation, etymology, and topic information. This is followed by one or more 'definition' lines.
+I have written line-by-line parsers in the past that use explicit state transition, so this was a natural first approach. My first major insight while writing the first stage was to avoid transformations that lose information. For example, early versions aggregated entries with identical words collapsed multiple entries with matching pronunciation lines, as these appear to indicate the degree of relatedness between multiple definition blocks.
+
+Another early challenge was to decide on some terminology; this evolved over the course of the project.
+
+Finally, the problem of verifying correctness emerged immediately. Development of the parser was guided by informal tests and spot checks within the code, but it soon became clear that this would not be sufficient.
 
 ## Second Stage
 
-I quickly became obsessed with trying to parse the grammar lines, even though they are somewhat tangential to the main goal of analyzing the word sets from the definitions. It's an interesting problem for several reasons:
-- Despite being fairly structured, the grammar of the 'grammar' lines appears to be fuzzy/inconsistent at a conceptual level.
-- Additionally, there appear to be some typos in various lines (not sure if the distinction between these two points is legitimate or not).
-- Some of the lines aren't even so easy for a human (or at least me) to read!
+I quickly became obsessed with trying to parse the technical lines, even though they are somewhat tangential to the main goal of analyzing the word sets from the definitions. It's an interesting problem for several reasons:
+- Despite appearing fairly structured, the technical lines have structural inconsistencies.
+- Additionally, there are typos in some lines, as well as ambiguous and undocumented escape sequences.
+- Some of the abbreviations are not consistent (e.g. 'from' and 'fr.'), making classification of the parts harder.
+- Some of the lines are not so easy for a human (or at least me) to read!
 
-My first parsing attempt with regular expressions failed miserably, due to the presence of parenthetical comments that themselves contain periods. This made sentence-by-sentence scanning impossible.
+My first parsing attempt (using regular expressions) failed miserably. This made sentence-by-sentence scanning impossible. I then embarked on a long exploration of techniques for parsing nested parentheses and brackets, and after a fun detour into dynamic programming algorithms, settled on the simple recursive decent approach shown in `parsing.parse_nest()`. The major features of this function are:
+- automatic repair of missing end delimiter.
+- detection of missing inner delimiter.
 
 My second attempt was a simple parsing function that splits the string into words, and recognizes parentheses and brackets as subtrees. It's a weird approach in that it essentially lexes and parses in one step, but then requires post-processing that would normally be done within the parsing step, e.g. turning the sequence of positional and optional elements into a proper struct of labeled fields.
 
+
+# Verification
+
+One problem with test scripts is that the code for detecting problems is sometimes far removed from the code for fixing them. Even worse, often the development process proceeds as follows:
+- given a stage currently under development, an immediate or potential flaw becomes apparent.
+- the developer inserts a check for the flaw somewhere in the code (either in the not-yet-working current stage, or somewhere else, but typically in loop over the data).
+- this check reveals some number of flaws.
+- the developer then decides on a strategy (which may change dramatically several times over the course of the whole project), and implements one or more fixes, wherever they are most appropriate.
+- the check is then either:
+  - left in place but no longer executes because all of the flaws are addressed;
+  - removed because it is slow or inconveniently located;
+  - factored out into some side branch of the computation graph for posterity.
+
+The broad question to address is this: what is the best strategy for correctness and clarity regarding working with such checks and fixes? The last option, 'factor out', helps in these regards, but it is still not so obvious how to organize the code. For this experiment, I implemented a new file type, '.tests', which is simply a list of scripts to execute. By creating a top-level 'test.tests' file with all of the checks that have accumulated over the course of the project, I can simply run `$ muck test` and all of the checks will run.
+
+The limitation of this technique is that it does not show how the flaws occur before the fix was in place. Ideally, we would be able to easily run the check on both the 'before' and 'after' data, so that reviewers can see how the fix behaves. Furthermore, the intent of the code would be much clearer if the check and fix logic was somehow colocated.
+
+This investigation suggests a major limitation of the file-based perspective inherent in Muck: many operations occur on a per-record basis, rather than per-file. It may be that the 'checks and fixes' strategy is better implemented at as functions that can sit together in code, and are applied to records automatically.
 
 

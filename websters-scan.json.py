@@ -6,7 +6,6 @@
 # it does not do much in the way of content analysis;
 # the goal is get some structure to the data while preserving the more challenging quirks.
 
-import sys
 import re
 import muck
 import json
@@ -81,7 +80,7 @@ for (line_num, line_raw) in enumerate(text):
 
   def error(msg=None):
     note(msg, label="ERROR")
-    sys.exit(1)
+    exit(1)
 
   def flush_defn():
     global defn_lines
@@ -179,4 +178,4 @@ for (line_num, line_raw) in enumerate(text):
 flush_record()
 
 errFL('writing {} records', len(records))
-json.dump(records, sys.stdout, indent=2)
+json.dump(records, stdout, indent=2)

@@ -6,14 +6,16 @@
 #     pronunciation, kind (e.g. noun, adj), etymology, and list of definitions:
 #       topic (e.g. botany, music), description.
 
-import sys
-import re
-import muck
 import json
+import muck
+import re
 
 from pithy import *
 
-from parsing import parse_nest
+from parsing import *
+
+
+scanned = muck.source('websters-scan.json')
 
 
 def desc_for_tree(tree):
@@ -31,15 +33,15 @@ def is_paren_tree(tree):
 tech_issues = 0
 
 def parse_entry(name, tech, defns):
-  tech_tree, _ = parse_nest(tech)
+  tech_tree = parse_nest(tech)
 
   def warn(fmt, *items):
     global tech_issues
     tech_issues += 1
     errFL('{}\n  {}\n  ' + fmt, name, tech, *items)
 
-  if 'ø' in str(tech_tree):
-    warn('bad tech tree')
+  if is_tree_flawed(tech_tree):
+    warn('flawed tech tree')
 
 
 
@@ -63,14 +65,10 @@ class Entry():
       self.pron, self.gram, self.pre_misc, self.etyms, 'e' if self.is_etym_labeled else 'i',
       self.topic, self.post_misc)
 
-
-
-scanned = muck.source('websters-scanned.json')
-
 refined = []
 for record in scanned:
   entry = parse_entry(*record)
 
 errFL('tech issues: {}', tech_issues)
 
-json.dump(refined, sys.stdout, indent=2 )
+json.dump(refined, stdout, indent=2 )

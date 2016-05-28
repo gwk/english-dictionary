@@ -1,5 +1,5 @@
 pat v0
-websters-raw.txt
+websters-lines.txt
 
 | ANNOY
 | An*noy", v. t. [imp. & p. p. Annoyed; p. pr. & vb. n. Annoying.]
