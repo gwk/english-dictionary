@@ -22,7 +22,7 @@ def check_record(name, tech, defns):
   def warn_tech(fmt, *items):
     global tech_issues
     tech_issues += 1
-    errFL('\ntech: {}:\n  {}\n  {}\n  ' + fmt, name, tech, desc_for_tree(tech_tree), *items)
+    errFL('\ntech: {}:\n  {}\n  {}\n  ' + fmt, name, tech, tech_tree, *items)
 
   if not tech_tree:
     warn_tech('empty')
@@ -35,8 +35,7 @@ def check_record(name, tech, defns):
   m = re.search(r' \(([^-=#`"0-9a-zA-Zäéêôü])', tech)
   if m: warn_tech('paren punctuation: {!r}', m.group(1))
 
-  if re.search('[{}]', tech):
-    warn_tech('braces')
+  if re.search('[{}]', tech): warn_tech('braces')
 
   if is_tree_flawed(tech_tree):
     warn_tech('flawed tech tree')

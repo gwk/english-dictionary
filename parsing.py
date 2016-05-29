@@ -5,13 +5,31 @@ from pithy import *
 from pithy.ansi import *
 
 
-nest_pairs = {
-  '(' : ')',
-  '[' : ']',
-  '{' : '}'
+class Nest(tuple):
+  def __str__(self):
+    return ' '.join(str(el) for el in self)
+
+class Parens(tuple):
+  def __str__(self):
+    return '({})'.format(' '.join(str(el) for el in self))
+
+class Brackets(tuple):
+  def __str__(self):
+    return '[{}]'.format(' '.join(str(el) for el in self))
+
+def is_tree_flawed(tree):
+  if isinstance(tree, str):
+    return tree in '])ø'
+  return any(is_tree_flawed(el) for el in tree)
+
+
+nests = {
+  '(' : (')', Parens),
+  '[' : (']', Brackets),
 }
 
-nest_closers = frozenset(nest_pairs.values())
+nest_closers = '])'
+
 
 def lex_leaf(text):
   return text.split()
@@ -30,46 +48,36 @@ def parse_nest(text):
   while pos < len(seq):
     t = seq[pos]
     try: # opener?
-      closer = nest_pairs[t]
+      closer, nest_class = nests[t]
     except KeyError: # not opener.
       res.extend(lex_leaf(t))
       pos += 1
     else: # opener.
-      sub, pos = _parse_nest_sub(seq, pos=pos+1, depth=1, opener=t, closer=closer)
-      res.append(sub)
-  return tuple(res)
+      sub, pos = _parse_nest_sub(seq, pos=pos+1, depth=1, closer=closer)
+      res.append(nest_class(sub))
+  return Nest(res)
 
-def _parse_nest_sub(seq, pos, depth, opener, closer):
-  res = [opener]
+def _parse_nest_sub(seq, pos, depth, closer):
+  res = []
   while pos < len(seq):
     t = seq[pos]
     if t == closer:
-      res.append(t)
-      return tuple(res), (pos + 1)
+      return res, (pos + 1)
     if t in nest_closers: # unexpected closer; always a flaw.
       res.append('ø')
-      return tuple(res), pos
+      return res, pos
     try:
-      sub_closer = nest_pairs[t]
+      sub_closer, nest_class = nests[t]
     except KeyError: # regular token; simply advance.
       res.extend(lex_leaf(t))
       pos += 1
     else: # found opener.
-      sub, pos = _parse_nest_sub(seq, pos=pos+1, depth=depth+1, opener=t, closer=sub_closer)
-      res.append(sub)
-  assert pos == len(seq)
+      sub, pos = _parse_nest_sub(seq, pos=pos+1, depth=depth+1, closer=sub_closer)
+      res.append(nest_class(sub))
   # missing closer at end of seq. auto-repair at the top level only.
-  res.append(closer if (depth == 1) else 'ø')
-  return tuple(res), pos
-
-
-def _is_tree_flawed(tree):
-  if is_str(tree):
-    return tree == 'ø'
-  return any(_is_tree_flawed(t) for t in tree)
-
-def is_tree_flawed(tree):
-  return any(_is_tree_flawed(el) for el in tree)
+  if depth > 1:
+    res.append('ø')
+  return res, pos
 
 
 _magenta_null = BG_M + 'ø' + RST
