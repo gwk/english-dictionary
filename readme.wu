@@ -46,6 +46,14 @@ My first parsing attempt (using regular expressions) failed miserably. This made
 
 My second attempt was a simple parsing function that splits the string into words, and recognizes parentheses and brackets as subtrees. It's a weird approach in that it essentially lexes and parses in one step, but then requires post-processing that would normally be done within the parsing step, e.g. turning the sequence of positional and optional elements into a proper struct of labeled fields.
 
+## Cleaning
+
+The major problem with data cleaning is the risk of overcorrection. One emerging goal of this project is to articulate and practice a strategy consisting of:
+- identify and implement a check for a flaw.
+- implement a fix.
+- preserve both the check and the fix in the codebase in a clear, coherent way.
+- be able to verify that the check and fix remain well behaved, either after code refactorings or alterations to the input data.
+
 
 # Verification
 
