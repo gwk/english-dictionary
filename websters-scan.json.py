@@ -24,31 +24,6 @@ known_excluded_names = {'M.', 'P.', 'X.'}
 known_empty_tech = known_excluded_names.union(
   {'B', 'C', 'D', 'E', 'G', 'H', 'I', 'J', 'K', 'L', 'N', 'O', 'Q', 'S', 'U', 'V', 'W', 'Y'})
 
-punctuation_escape_re = re.compile(r' \(([][()/.,; ])')
-dangling_paren_re = re.compile(r'(\([^][();,-]+)(\]|$)')
-
-remove_various_re = re.compile(r'''(?x)
-  [{}] # manually reviewed; braces occur in only a few places and serve no useful purpose.
-| \(;\ 48\) # some weird escape pattern.
-| ;\ 48\)   # same, but without leading paren.
-| ;\ 48,\ 61\) # single occurrence for DISADVANTAGE.
-''')
-
-
-def fix_tech(tech):
-  'apply various fixes to the technical line.'
-  tech = punctuation_escape_re.sub(lambda m: m.group(1), tech)
-  tech = tech.rstrip(' (') # lots of trailing open-parens.
-  tech = dangling_paren_re.sub(lambda m: m.group(1) + ')]', tech)
-  tech = remove_various_re.sub('', tech)
-  return tech
-
-
-def fix_defn(defn):
-  defn = remove_various_re.sub('', defn)
-  return defn
-
-
 # parser is a simple state-machine.
 State = Enum('State', [
   'none',
@@ -90,19 +65,15 @@ for (line_num, line_raw) in enumerate(text):
 
   def flush_defn():
     global defn_lines # have to be careful not to alias defn_lines anywhere else.
-    defn = fix_defn(' '.join(defn_lines))
-    defns.append(defn)
+    defns.append(' '.join(defn_lines))
     defn_lines = []
 
   def flush_record():
     global name
     global tech
     global defns
-    if name is None:
-      error("empty record")
-    if name in known_excluded_names:
-      return
-    tech = fix_tech(tech)
+    if name is None: error("empty record")
+    if name in known_excluded_names: return
     records.append([name, tech, defns])
     name = None # cleared here just for clarity of the state machine.
     tech = None # " ".

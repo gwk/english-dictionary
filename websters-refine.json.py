@@ -15,7 +15,7 @@ from pithy import *
 from parsing import *
 
 
-scanned = muck.source('websters-scan.json')
+scanned = muck.source('websters-scan-fix.json')
 
 
 def desc_for_tree(tree):

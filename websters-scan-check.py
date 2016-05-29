@@ -8,7 +8,7 @@ from pithy import *
 
 from parsing import *
 
-records = muck.source('websters-scan.json')
+records = muck.source('websters-scan-fix.json')
 
 
 tech_issues = 0
