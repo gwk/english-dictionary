@@ -21,7 +21,7 @@ name_re = re.compile(r"[A-Z][- '.;A-Z0-9]*")
 
 # known exceptional cases.
 known_excluded_names = {'M.', 'P.', 'X.'}
-known_empty_gram = known_excluded_names.union(
+known_empty_tech = known_excluded_names.union(
   {'B', 'C', 'D', 'E', 'G', 'H', 'I', 'J', 'K', 'L', 'N', 'O', 'Q', 'S', 'U', 'V', 'W', 'Y'})
 
 punctuation_escape_re = re.compile(r' \(([][()/.,; ])')
@@ -55,7 +55,7 @@ state_names = (
   'init',
   'blank',
   'name',
-  'gram', # grammar and pronunciation.
+  'tech', # tecnical line: pronunciation, grammar, etymology, topic.
   'defn',
 )
 
@@ -64,13 +64,13 @@ state_names = (
   s_init,
   s_blank,
   s_name,
-  s_gram,
+  s_tech,
   s_defn) = range(len(state_names))
 
 # mutable, global parser state.
 prev_state = s_init
 name = None
-gram = None
+tech = None
 defn_lines = []
 defns = []
 
@@ -104,16 +104,16 @@ for (line_num, line_raw) in enumerate(text):
 
   def flush_record():
     global name
-    global gram
+    global tech
     global defns
     if name is None:
       error("empty record")
     if name in known_excluded_names:
       return
-    tech = fix_tech(gram) # TODO: rename gram everywhere.
+    tech = fix_tech(tech)
     records.append([name, tech, defns])
     name = None # cleared here just for clarity of the state machine.
-    gram = None # " ".
+    tech = None # " ".
     defns = []
 
   # end condition.
@@ -133,14 +133,14 @@ for (line_num, line_raw) in enumerate(text):
     state = s_blank
     if prev_state == s_blank:
       pass
-    elif prev_state == s_name: # missing grammar; happens for some of the letters.
-      if name not in known_empty_gram:
-        warn('no grammar')
-      gram = name
+    elif prev_state == s_name: # missing tech; happens for some of the letters.
+      if name not in known_empty_tech:
+        warn('no tech')
+      tech = name
     elif prev_state == s_defn:
       flush_defn()
     else:
-      assert(prev_state == s_gram)
+      assert(prev_state == s_tech)
 
   elif prev_state == s_blank:
     if name_re.fullmatch(line) and line.find('  ') == -1:
@@ -153,19 +153,19 @@ for (line_num, line_raw) in enumerate(text):
 
   elif prev_state == s_name:
     if re.match(r'\d', line):
-      note('missing blank and grammar between name and definition')
+      note('missing blank and technical lines between name and definition')
       state = s_defn
     else:
-      state = s_gram
-      gram = line
+      state = s_tech
+      tech = line
 
-  elif prev_state == s_gram:
+  elif prev_state == s_tech:
     if re.match(r'\s*\([a-z]\)', line):
-      #note('missing blank between grammar and definition')
+      #note('missing blank between technical and definition')
       state = s_defn
     else:
-      state = s_gram
-      gram += ' ' + line
+      state = s_tech
+      tech += ' ' + line
 
   elif prev_state == s_defn:
     if re.match(r'\s*(\([a-z]\)|--)', line):
@@ -182,7 +182,7 @@ for (line_num, line_raw) in enumerate(text):
   # state actions independent of transitions.
   if state == s_name:
     name = line
-    gram = ''
+    tech = ''
 
   elif state == s_defn:
     defn_lines.append(line)
