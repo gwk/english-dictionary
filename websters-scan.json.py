@@ -50,25 +50,17 @@ def fix_defn(defn):
 
 
 # parser is a simple state-machine.
-state_names = (
+State = Enum('State', [
   'none',
   'init',
   'blank',
   'name',
   'tech', # tecnical line: pronunciation, grammar, etymology, topic.
   'defn',
-)
-
-# use integer states for efficiency.
-( s_none,
-  s_init,
-  s_blank,
-  s_name,
-  s_tech,
-  s_defn) = range(len(state_names))
+])
 
 # mutable, global parser state.
-prev_state = s_init
+prev_state = State.init
 name = None
 tech = None
 defn_lines = []
@@ -79,7 +71,7 @@ records = []
 
 # parsing main loop.
 for (line_num, line_raw) in enumerate(text):
-  state = s_none
+  state = State.none
   line = line_raw.rstrip()
 
   def note(msg, label='NOTE'):
@@ -121,58 +113,58 @@ for (line_num, line_raw) in enumerate(text):
     break
 
   # initial transition.
-  if prev_state == s_init:
+  if prev_state == State.init:
     if line == 'A': # first entry.
-      state = s_name
+      state = State.name
     else:
       continue
 
   # main state transitions.
 
   if line == '':
-    state = s_blank
-    if prev_state == s_blank:
+    state = State.blank
+    if prev_state == State.blank:
       pass
-    elif prev_state == s_name: # missing tech; happens for some of the letters.
+    elif prev_state == State.name: # missing tech; happens for some of the letters.
       if name not in known_empty_tech:
         warn('no tech')
       tech = name
-    elif prev_state == s_defn:
+    elif prev_state == State.defn:
       flush_defn()
     else:
-      assert(prev_state == s_tech)
+      assert(prev_state == State.tech)
 
-  elif prev_state == s_blank:
+  elif prev_state == State.blank:
     if name_re.fullmatch(line) and line.find('  ') == -1:
       # note: the find clause excludes lines from the extended definition for 'MORSE CODE'.
-      state = s_name
+      state = State.name
       flush_record()
     else:
-      state = s_defn
+      state = State.defn
       assert(not defn_lines)
 
-  elif prev_state == s_name:
+  elif prev_state == State.name:
     if re.match(r'\d', line):
       note('missing blank and technical lines between name and definition')
-      state = s_defn
+      state = State.defn
     else:
-      state = s_tech
+      state = State.tech
       tech = line
 
-  elif prev_state == s_tech:
+  elif prev_state == State.tech:
     if re.match(r'\s*\([a-z]\)', line):
       #note('missing blank between technical and definition')
-      state = s_defn
+      state = State.defn
     else:
-      state = s_tech
+      state = State.tech
       tech += ' ' + line
 
-  elif prev_state == s_defn:
+  elif prev_state == State.defn:
     if re.match(r'\s*(\([a-z]\)|--)', line):
       flush_defn()
-    state = s_defn
+    state = State.defn
 
-  if state == s_none:
+  if state == State.none:
     error('bad transition')
 
   if False:
@@ -180,11 +172,11 @@ for (line_num, line_raw) in enumerate(text):
       line_num + 1, state_names[prev_state], state_names[state], line)
 
   # state actions independent of transitions.
-  if state == s_name:
+  if state == State.name:
     name = line
     tech = ''
 
-  elif state == s_defn:
+  elif state == State.defn:
     defn_lines.append(line)
 
   prev_state = state
