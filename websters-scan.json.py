@@ -27,9 +27,12 @@ known_empty_gram = known_excluded_names.union(
 punctuation_escape_re = re.compile(r' \(([][()/.,; ])')
 dangling_paren_re = re.compile(r'(\([^][();,-]+)(\]|$)')
 
-remove_various_re = re.compile('|'.join(re.escape(text) for text in [
-  '{', '}', # manually reviewed; braces occur in only a few places and serve no useful purpose.
-]))
+remove_various_re = re.compile(r'''(?x)
+  [{}] # manually reviewed; braces occur in only a few places and serve no useful purpose.
+| \(;\ 48\) # some weird escape pattern.
+| ;\ 48\)   # same, but without leading paren.
+| ;\ 48,\ 61\) # single occurrence for DISADVANTAGE.
+''')
 
 
 def fix_tech(tech):

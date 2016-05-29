@@ -37,8 +37,10 @@ def check_record(name, tech, defns):
 
   if re.search('[{}]', tech): warn_tech('braces')
 
-  if is_tree_flawed(tech_tree):
-    warn_tech('flawed tech tree')
+  m = re.search(r'; (\d+\)?)', tech)
+  if m: warn_tech('escape sequence: {!r}', m.group(1))
+
+  if is_tree_flawed(tech_tree): warn_tech('flawed tech tree')
 
   if not defns:
     warn_tech('empty defns')
