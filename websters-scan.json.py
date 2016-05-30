@@ -156,4 +156,4 @@ for (line_num, line_raw) in enumerate(text):
 flush_record()
 
 errFL('writing {} records', len(records))
-json.dump(records, stdout, indent=2)
+out_json(records)
