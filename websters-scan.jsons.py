@@ -11,6 +11,7 @@ import muck
 import json
 
 from pithy import *
+from Record import Record
 
 
 text = muck.source('websters-p3-misc.txt')
@@ -40,9 +41,25 @@ name = None
 tech = None
 defn_lines = []
 defns = []
+record_count = 0
 
-# records is a list of triples: (name, technical, [definitions]).
-records = []
+def flush_defn():
+  global defn_lines # have to be careful not to alias defn_lines anywhere else.
+  defns.append(' '.join(defn_lines))
+  defn_lines = []
+
+def flush_record():
+  global name
+  global tech
+  global defns
+  global record_count
+  assert name
+  if name in known_excluded_names: return
+  record_count += 1
+  out_json(Record(name, tech, tuple(defns)))
+  name = None # cleared here just for clarity of the state machine.
+  tech = None # " ".
+  defns = []
 
 # parsing main loop.
 for (line_num, line_raw) in enumerate(text):
@@ -62,22 +79,6 @@ for (line_num, line_raw) in enumerate(text):
   def error(msg=None):
     note(msg, label="ERROR")
     exit(1)
-
-  def flush_defn():
-    global defn_lines # have to be careful not to alias defn_lines anywhere else.
-    defns.append(' '.join(defn_lines))
-    defn_lines = []
-
-  def flush_record():
-    global name
-    global tech
-    global defns
-    if name is None: error("empty record")
-    if name in known_excluded_names: return
-    records.append([name, tech, defns])
-    name = None # cleared here just for clarity of the state machine.
-    tech = None # " ".
-    defns = []
 
   # end condition.
   if line == "End of Project Gutenberg's Webster's Unabridged Dictionary, by Various":
@@ -152,8 +153,7 @@ for (line_num, line_raw) in enumerate(text):
 
   prev_state = state
 
-# flush final record.
-flush_record()
 
-errFL('writing {} records', len(records))
-out_json(records)
+flush_record() # flush final record.
+
+errFL('scanned {} records.', record_count)

@@ -12,10 +12,11 @@ I started with the Project Gutenberg version of Webster's Unabridged Dictionary,
 For clarity, I came up with a few terms for clarity in the code and documentation:
 - 'raw line': a line of text from the original document, which had line breaks inserted to wrap at 78 characters (typical of older text produced for viewing on 80 character terminals).
 - 'logical line', 'line': a line of text created during the 'scan' step by grouping and joining one or more raw lines.
-- 'entry': conceptually, a record within the dictionary, consisting of the 'name', 'technical line', and 'definitions'. There are many entries with non-unique names in the Webster's text.
-- 'name': within an entry, the name is the word being defined.
-- 'technical line', 'tech': the logical line in an entry immediately following the name. This line contains the pronunciation, part of speech, etymology, and topic information.
-- 'definition', 'defn': a 
+- 'record': conceptually, the basic unit of data within the dictionary, consisting of the 'name', 'technical line', and 'definitions'. Note that there are many entries with non-unique names in the Webster's text.
+- 'name': within a record, the name is the word being defined.
+- 'technical line', 'tech': the logical line in a record immediately following the name. This line contains the pronunciation, part of speech, etymology, and topic information.
+- 'definition', 'defn': a logical line containing one of the record definitions.
+- 'scan': the first major transformation step, transforming the raw lines into 'scan records', consisting of the name, tech, and defn lines.
 
 # Experience
 

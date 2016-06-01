@@ -3,12 +3,11 @@ import muck
 import re
 
 from pithy import *
-
-
-records = muck.source('websters-scan.json')
+from Record import Record
 
 
 punctuation_escape_re = re.compile(r' \(([][()/.,; ])')
+
 dangling_paren_re = re.compile(r'(\([^][();,-]+)(\]|$)')
 
 remove_various_re = re.compile(r'''(?x)
@@ -19,14 +18,14 @@ remove_various_re = re.compile(r'''(?x)
 ''')
 
 
-tech_issues = 0
-def fix_tech(tech):
+def transform_tech(record):
   'apply various fixes to the technical line.'
+  tech = record.tech
   tech = punctuation_escape_re.sub(lambda m: m.group(1), tech)
   tech = tech.rstrip(' (') # lots of trailing open-parens.
   tech = dangling_paren_re.sub(lambda m: m.group(1) + ')]', tech)
   tech = remove_various_re.sub('', tech)
-  return tech
+  return record._replace(tech=tech)
 
 
 def fix_defn(defn):
@@ -34,11 +33,7 @@ def fix_defn(defn):
   return defn
 
 
-def fix_record(record):
-  name, tech, defns = record
-  return (name, fix_tech(tech), [fix_defn(d) for d in defns])
+#return Record(name, fix_tech(tech), [fix_defn(d) for d in defns])
 
 
-out_json(fix_record(r) for r in records)
-
-errFL('tech issues: {}', tech_issues)
+muck.transform('websters-scan.jsons', record_types=(Record,))
