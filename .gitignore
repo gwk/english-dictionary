@@ -6,4 +6,5 @@
 
 # project.
 _build/
+_fetch/
 _misc/
