@@ -1,10 +1,5 @@
-#!/usr/bin/env python3
-
-# parse the raw gutenberg text into a json dictionary.
-# this step structures the lines of text into discrete elements,
-# joining lines where appropriate.
-# it does not do much in the way of content analysis;
-# the goal is get some structure to the data while preserving the more challenging quirks.
+# parse the paragraph lines into records.
+# this step converts multiple lines of text into discrete Record objects.
 
 import re
 import muck
@@ -14,146 +9,52 @@ from pithy import *
 from Record import Record
 
 
-text = muck.source('websters-p3-misc.txt')
+text = muck.source('websters-para-lines.txt')
 
 
-# parsing is primarily based on recognizing dictionary entries as capitalized words.
-name_re = re.compile(r"[A-Z][- '.;A-Z0-9]*")
-
-# known exceptional cases.
-known_excluded_names = {'M.', 'P.', 'X.'}
-known_empty_tech = known_excluded_names.union(
-  {'B', 'C', 'D', 'E', 'G', 'H', 'I', 'J', 'K', 'L', 'N', 'O', 'Q', 'S', 'U', 'V', 'W', 'Y'})
-
-# parser is a simple state-machine.
-State = Enum('State', [
-  'none',
-  'init',
-  'blank',
-  'name',
-  'tech', # tecnical line: pronunciation, grammar, etymology, topic.
-  'defn',
-])
-
-# mutable, global parser state.
-prev_state = State.init
+# parser state.
 name = None
 tech = None
-defn_lines = []
 defns = []
-record_count = 0
-
-def flush_defn():
-  global defn_lines # have to be careful not to alias defn_lines anywhere else.
-  defns.append(' '.join(defn_lines))
-  defn_lines = []
 
 def flush_record():
   global name
   global tech
-  global defns
   global record_count
   assert name
-  if name in known_excluded_names: return
-  record_count += 1
   out_json(Record(name, tech, tuple(defns)))
   name = None # cleared here just for clarity of the state machine.
   tech = None # " ".
-  defns = []
+  del defns[:]
 
-# parsing main loop.
-for (line_num, line_raw) in enumerate(text):
-  state = State.none
+def add_defns(line):
+  defns.append(line)
+
+
+for line_num, line_raw in err_progress(enumerate(text, 1), 'lines'):
   line = line_raw.rstrip()
 
-  def note(msg, label='NOTE'):
-    errFL('{}: line {}', label, line_num + 1)
-    errFL('  state: {} -> {}; name: {!r}', state_names[prev_state], state_names[state], name)
-    errFL('  line: {!r}', line)
-    if msg:
-      errFL('  {}', msg)
-
-  def warn(msg):
-    note(msg, label="WARNING")
-
-  def error(msg=None):
-    note(msg, label="ERROR")
-    exit(1)
-
-  # end condition.
-  if line == "End of Project Gutenberg's Webster's Unabridged Dictionary, by Various":
-    break
-
-  # initial transition.
-  if prev_state == State.init:
-    if line == 'A': # first entry.
-      state = State.name
-    else:
-      continue
-
-  # main state transitions.
-
-  if line == '':
-    state = State.blank
-    if prev_state == State.blank:
-      pass
-    elif prev_state == State.name: # missing tech; happens for some of the letters.
-      if name not in known_empty_tech:
-        warn('no tech')
-      tech = name
-    elif prev_state == State.defn:
-      flush_defn()
-    else:
-      assert(prev_state == State.tech)
-
-  elif prev_state == State.blank:
-    if name_re.fullmatch(line) and line.find('  ') == -1:
-      # note: the find clause excludes lines from the extended definition for 'MORSE CODE'.
-      state = State.name
+  if line.startswith('<hw>'):
+    if line_num != 1:
       flush_record()
+
+    # find name.
+    m = re.match(r'<hw>(.+)</hw>', line)
+    assert m
+    name = m.group(1)
+    rest = line[m.end():]
+    assert not re.search(r'</?hw>', rest)
+
+    # find end of tech.
+    m = re.search(r'<def>', rest)
+    if not m: # tech line was not smushed with definitions.
+      tech = rest
     else:
-      state = State.defn
-      assert(not defn_lines)
+      i = m.start()
+      tech = rest[:i]
+      add_defns(rest[i:])
 
-  elif prev_state == State.name:
-    if re.match(r'\d', line):
-      note('missing blank and technical lines between name and definition')
-      state = State.defn
-    else:
-      state = State.tech
-      tech = line
-
-  elif prev_state == State.tech:
-    if re.match(r'\s*\([a-z]\)', line):
-      #note('missing blank between technical and definition')
-      state = State.defn
-    else:
-      state = State.tech
-      tech += ' ' + line
-
-  elif prev_state == State.defn:
-    if re.match(r'\s*(\([a-z]\)|--)', line):
-      flush_defn()
-    state = State.defn
-
-  if state == State.none:
-    error('bad transition')
-
-  if False:
-    errFL('{:6}: {:5} -> {:5}: {}',
-      line_num + 1, state_names[prev_state], state_names[state], line)
-
-  # state actions independent of transitions.
-  if state == State.name:
-    name = line
-    tech = ''
-
-  elif state == State.defn:
-    defn_lines.append(line)
-
-  prev_state = state
-
+  else:
+    add_defns(line)
 
 flush_record() # flush final record.
-
-errFL('scanned {} records.', record_count)

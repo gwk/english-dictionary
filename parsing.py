@@ -5,27 +5,45 @@ from pithy import *
 from pithy.ansi import *
 
 
-class Nest(tuple):
-  def __str__(self):
-    return ' '.join(str(el) for el in self)
+class ParseTree(tuple):
+  def __repr__(self):
+    return type(self).__name__ + super().__repr__()
 
-class Parens(tuple):
+class Parens(ParseTree):
   def __str__(self):
     return '({})'.format(' '.join(str(el) for el in self))
 
-class Brackets(tuple):
+class Brackets(ParseTree):
   def __str__(self):
     return '[{}]'.format(' '.join(str(el) for el in self))
 
+class Brackets(ParseTree):
+  def __str__(self):
+    return '{{{}}}'.format(' '.join(str(el) for el in self))
+
+
+class TagTree(ParseTree):
+  def 
+
+def mk_tag_type(tag_name):
+  class ParseTree_type(ParseTree):
+    def __str__(self):
+      return '<{}>{}</{}>'.format(tag_name, ' '.join(str(el) for el in self), tag_name)
+  name = 'Tag_' + tag_name.capitalize()
+  ParseTree_type.__name__ = name
+  ParseTree_type.__qualname__ = name
+  return ParseTree_type
+
 def is_tree_flawed(tree):
   if isinstance(tree, str):
-    return tree in '])ø'
+    return tree in '])}ø'
   return any(is_tree_flawed(el) for el in tree)
 
 
 nests = {
   '(' : (')', Parens),
   '[' : (']', Brackets),
+  '{' : ('}', Braces),
 }
 
 nest_closers = '])'
