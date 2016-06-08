@@ -20,8 +20,8 @@ text = muck.source('websters-para-lines.txt')
 entities = set()
 
 for i, line in enumerate(text):
-  assert not re.search(r'<\w+/', line)
-  for m in re.finditer(r'&(\w*);', line):
+  checkF(not re.search(r'<[^/>]+/', line), 'weird escape syntax: {!r}', line)
+  for m in re.finditer(r'&([^;\s]*);', line):
     e = m.group(1)
     entities.add(e)
 

@@ -20,5 +20,7 @@ def drop_alphabet_headers(line):
 def edit_page_num_inlines(line):
   return re.sub(r'<![^>]*>', '', line)
 
+def edit_br_tags(line):
+  return re.sub(r'<BR>', '&NewLine;', line)
 
-muck.transform('websters-agg-p2-misc.txt')
+muck.transform('websters-agg-pN-misc.txt')

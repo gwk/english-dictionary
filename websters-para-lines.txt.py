@@ -1,6 +1,5 @@
 # parse the aggregated gutenberg text by coalesting top-level <p> blocks into single lines.
 
-import json
 import muck
 import re
 

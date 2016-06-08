@@ -8,16 +8,14 @@
 
 
 import html.entities as std_entities
-import json
 import muck
-import re
 import unicodedata
 
 from pithy import *
 
 
 # this dictionary was transcribed from the micra webfont.txt documentation file.
-# they served as the hints with which the entities below were created by hand.
+# it served as the hints with which some entities below were created by hand.
 micra_webfont_entity_descriptions = { k.strip(' *</') : v for (k, v) in \
   muck.source('micra-webfont-entities.json').items() }
 
@@ -36,6 +34,8 @@ ent_xhtml = std_entities.entitydefs
 
 
 manual = {
+  '?'       : '(?)',
+
   'CHI'     : 'Χ', # GREEK CAPITAL LETTER CHI.
   'DELTA'   : 'Δ', # GREEK CAPITAL LETTER DELTA.
   'GAMMA'   : 'Ɣ', # LATIN CAPITAL LETTER GAMMA.
@@ -75,7 +75,8 @@ manual = {
   'yogh'      : 'ȝ', # LATIN SMALL LETTER YOGH.
   'til'       : '~', # guess.
   'oomac'     : 'ꝏ\u0304', # LATIN SMALL LETTER OO, COMBINING MACRON. guess.
-
+  '/amacr'    : 'a\u0304', # COMBINING MACRON. looks like slash is just a typo.
+  
   'frac00'        : '0/0',
   'frac1000x1434' : '1000/1434',
   'frac12x13'     : '12/13',
@@ -153,8 +154,7 @@ def get_trans(e):
 
   c = ent_html5.get(e)
   if c:
-    note = '' if e in ent_xhtml else '  (not xhtml)'
-    #errFL('html5: {} -> {}{}', e, c, note)
+    #errFL('html5: {} -> {}{}', e, c, '' if e in ent_xhtml else '  (not xhtml)')
     return c
 
   c =guess_trans(e)
@@ -167,7 +167,7 @@ def get_trans(e):
   return '({}?)'.format(e)
 
 # prefer composed characters over combining sequences.
-trans = { e : unicodedata.normalize('NFC', get_trans(e)) for e in entities }
+trans = { '&{};'.format(e) : unicodedata.normalize('NFC', get_trans(e)) for e in entities }
 
 out_json(trans)
 

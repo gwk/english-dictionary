@@ -1,125 +1,144 @@
 
+import pithy.meta as meta
+import muck
 import re
 
 from pithy import *
 from pithy.ansi import *
 
 
-class ParseTree(tuple):
+entities_map = muck.source('websters-entities-map.json')
+entity_choices = '|'.join(re.escape(e) for e in entities_map)
+entities_re = re.compile('({})'.format(entity_choices))
+
+def lex_leaf(text):
+  return entities_re.sub(lambda m: entities_map[m.group()], text).split()
+
+
+class Tree(tuple):
+  'base class for parse tree nodes.'
+  start = ''
+  end = ''
+
   def __repr__(self):
     return type(self).__name__ + super().__repr__()
 
-class Parens(ParseTree):
   def __str__(self):
-    return '({})'.format(' '.join(str(el) for el in self))
+    return '{}{}{}'.format(self.start, ' '.join(str(el) for el in self), self.end)
 
-class Brackets(ParseTree):
-  def __str__(self):
-    return '[{}]'.format(' '.join(str(el) for el in self))
+  def colored_name(self):
+    n = type(self).__name__
+    if isinstance(self, UnexpectedEnd): return TXT_R + n + RST_TXT
+    if isinstance(self, MissingEnd): return TXT_M + n + RST_TXT
+    if isinstance(self, Flawed): return TXT_Y + n + RST_TXT
+    return n
 
-class Brackets(ParseTree):
-  def __str__(self):
-    return '{{{}}}'.format(' '.join(str(el) for el in self))
+  def desc(self, _depth=0):
+    'multiline indented description. _depth is a private recursive parameter.'
 
-
-class TagTree(ParseTree):
-  def 
-
-def mk_tag_type(tag_name):
-  class ParseTree_type(ParseTree):
-    def __str__(self):
-      return '<{}>{}</{}>'.format(tag_name, ' '.join(str(el) for el in self), tag_name)
-  name = 'Tag_' + tag_name.capitalize()
-  ParseTree_type.__name__ = name
-  ParseTree_type.__qualname__ = name
-  return ParseTree_type
-
-def is_tree_flawed(tree):
-  if isinstance(tree, str):
-    return tree in '])}ø'
-  return any(is_tree_flawed(el) for el in tree)
+    strings = [self.colored_name(), '(']
+    if all(isinstance(el, str) for el in self):
+      strings.append(repr(' '.join(self)))
+    else:
+      d = _depth + 1
+      for el in self:
+        strings.append('\n')
+        strings.append('  ' * d)
+        if isinstance(el, str): strings.append(el)
+        else: strings.extend(el.desc(d))
+    strings.append(')')
+    return strings if _depth else ''.join(strings)
 
 
-nests = {
-  '(' : (')', Parens),
-  '[' : (']', Brackets),
-  '{' : ('}', Braces),
-}
+class Flawed(): pass
 
-nest_closers = '])'
+class MissingEnd(Flawed): pass
+
+class UnexpectedEnd(Flawed): pass
 
 
-def lex_leaf(text):
-  return text.split()
+@memoize()
+def mk_tree_type(_start, _end):
+  class TreeType(Tree):
+    start = _start
+    end = _end
+  return meta.rename(TreeType, 'Tag_' + re.sub(r'[^a-zA-Z0-9]', '_', _start))
 
-_lex_choice = '|'.join(re.escape(c) for c in '()[]{}')
-_lex_re = re.compile('({})'.format(_lex_choice))
+# rename these more appropriately.
+Parens    = meta.rename(mk_tree_type('(', ')'), 'Parens')
+Brackets  = meta.rename(mk_tree_type('[', ']'), 'Brackets')
+Braces    = meta.rename(mk_tree_type('{', '}'), 'Braces')
 
-def lex_body(text):
-  return [t for t in _lex_re.split(text) if t]    
-
-
-def parse_nest(text):
-  seq = lex_body(text)
-  res = []
-  pos = 0
-  while pos < len(seq):
-    t = seq[pos]
-    try: # opener?
-      closer, nest_class = nests[t]
-    except KeyError: # not opener.
-      res.extend(lex_leaf(t))
-      pos += 1
-    else: # opener.
-      sub, pos = _parse_nest_sub(seq, pos=pos+1, depth=1, closer=closer)
-      res.append(nest_class(sub))
-  return Nest(res)
-
-def _parse_nest_sub(seq, pos, depth, closer):
-  res = []
-  while pos < len(seq):
-    t = seq[pos]
-    if t == closer:
-      return res, (pos + 1)
-    if t in nest_closers: # unexpected closer; always a flaw.
-      res.append('ø')
-      return res, pos
-    try:
-      sub_closer, nest_class = nests[t]
-    except KeyError: # regular token; simply advance.
-      res.extend(lex_leaf(t))
-      pos += 1
-    else: # found opener.
-      sub, pos = _parse_nest_sub(seq, pos=pos+1, depth=depth+1, closer=sub_closer)
-      res.append(nest_class(sub))
-  # missing closer at end of seq. auto-repair at the top level only.
-  if depth > 1:
-    res.append('ø')
-  return res, pos
+Tag_hw = mk_tree_type('<hw>', '</hw>')
 
 
-_magenta_null = BG_M + 'ø' + RST
-
-def _desc_for_tree(tree):
-  if is_str(tree):
-    if tree in nest_closers: return '{}{}{}'.format(BG_R, tree, RST)
-    return tree
-  assert len(tree) >= 2
-  closer = tree[-1]
-  return '{}{}{}'.format(
-    tree[0],
-    ' '.join(_desc_for_tree(el) for el in tree[1:-1]),
-    _magenta_null if closer == 'ø' else closer)
+@memoize()
+def mk_flawed_type(base_type, *flaws):
+  if not flaws: return base_type
+  class TreeFlawedType(base_type, *flaws): pass
+  return meta.rename(TreeFlawedType, base_type.__name__ + '_' + '_'.join(f.__name__ for f in flaws))
 
 
-def desc_for_tree(tree):
-  assert is_tuple(tree)
-  return ' '.join(_desc_for_tree(el) for el in tree)
+start_choices = (r'(\()', r'(\[)', r'(\{)', r'<([^/>]*)>')
+end_choices   = (r'(\))', r'(\])', r'(\})', r'</([^>]*)>')
+end_formats = (')', ']', '}', '</$>')
+
+assert len(start_choices) == len(end_choices)
+
+lexer_pattern = '|'.join(start_choices + end_choices)
+lexer = re.compile(lexer_pattern)
+
+choices_count = len(start_choices)
 
 
-def is_bracket_tree(tree):
-  return is_tuple(tree) and tree and tree[0] == '['
+def _parse_tree(text, match_stream, pos, depth, parent_end_index, end_index, tree_type):
+  subs = []
+  unexpected_end = False
+  missing_end = False
+  def res():
+    flaws = ()
+    if unexpected_end:
+      flaws += (UnexpectedEnd,)
+    if missing_end:
+      flaws += (MissingEnd,)
+    if any(isinstance(sub, Flawed) for sub in subs):
+      flaws += (Flawed,)
+    return mk_flawed_type(tree_type, *flaws)(subs)
 
-def is_paren_tree(tree):
-  return is_tuple(tree) and tree and tree[0] == '('
+  for match in match_stream:
+    start_index = match.start()
+    subs.extend(lex_leaf(text[pos:match.start()])) # leaf tokens.
+    match_index = match.lastindex
+    assert match_index is not None # all choices in the regex must be a paren group.
+    value = match.group(match_index)
+    pos = match.end()
+    if match_index == end_index:
+      return res(), pos
+    elif match_index <= choices_count: # found a start token (groups are 1-indexed).
+      start_str = match.group()
+      end_str = end_formats[match_index - 1].replace('$', value)
+      sub_type = mk_tree_type(start_str, end_str)
+      sub, pos = _parse_tree(text, match_stream, pos, depth + 1, parent_end_index=end_index,
+        end_index=(match_index + choices_count), tree_type=sub_type)
+      subs.append(sub)
+    elif end_index > 0 and match_index == parent_end_index: # parent end; missing end token.
+      match_stream.push(match) # put the parent end token back into the stream.
+      missing_end = True
+      return res(), pos
+    else: # unexpected end token.
+      has_unexpected_end = True
+      subs.append(match.group())
+  # end.
+  if end_index > 0: # not the root; missing end token.
+    missing_end = True
+  subs.extend(lex_leaf(text[pos:])) # leaf tokens.
+  return res(), len(text)
 
+
+def parse_tree(text):
+  match_stream = IterBuffer(lexer.finditer(text))
+  res, pos = _parse_tree(text, match_stream, pos=0, depth=0, parent_end_index=0, end_index=0, tree_type=Tree)
+  return res
+
+
+__all__ = ['parse_tree', 'Flawed', 'MissingEnd', 'UnexpectedEnd']
