@@ -1,9 +1,10 @@
-# find all '<…>' entity sequences in the text and output a list.
+# find all '<…>' tags in the text and output a list.
 
 import muck
 import re
 
 from pithy import *
+
 
 text = muck.source('websters-para-lines.txt')
 
