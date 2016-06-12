@@ -1,11 +1,5 @@
 pat v0
-websters-agg-p2-parse.txt
-
-| <i>Milward.</i></blockquote></p>
-| 
-| <p><hw>Am*bi"tion</hw> (&?;), <pos><i>n.</i></pos> [F. <i>ambition</i>, L.
-- <i>ambitio</i> a going around, especially of candidates for office is Rome,
-+ <i>ambitio</i> a going around, especially of candidates for office in Rome,
+websters-p4-content.txt
 
 | chiefly upon fruits.</def></p>
 | 

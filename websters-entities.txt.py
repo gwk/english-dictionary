@@ -15,7 +15,7 @@ import re
 
 from pithy import *
 
-text = muck.source('websters-para-lines.txt')
+text = muck.source('websters-raw-lines.txt')
 
 entities = set()
 

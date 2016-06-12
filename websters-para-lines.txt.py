@@ -46,6 +46,7 @@ for i, line in enumerate(text, 1):
     line = line[:-4] # strip closing p tag.
   
   if line:
+    # both leading and trailing space cases seem legitimate; leave alone for now.
     #checkF(not line[0].isspace() or is_leading_space_ok(line), 'leading space')
     #checkF(not line[-1].isspace(), 'trailing space')
     lines.append(line.strip())

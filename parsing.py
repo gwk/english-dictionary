@@ -10,13 +10,17 @@ from pithy import *
 from pithy.ansi import *
 
 
-__all__ = ['parse_tree', 'Tree', 'TreeFlawed', 'TreeUnexpected', 'TreeUnterminated']
+__all__ = [
+  'entity_replacements', 'parse_tree',
+  'Tree', 'TreeFlawed', 'TreeUnexpected', 'TreeUnterminated',
+]
 
 
-entities_map = muck.source('websters-entities-map.json')
-entity_choices = [re.escape(e) for e in entities_map]
+entity_replacements = muck.source('websters-entities.json')
 
-leaf_choices = [r'\s+'] + entity_choices
+
+# note: this entities pattern is equivalent to that in websters-entities.
+leaf_choices = [r'\s+', r'&[^;\s]*;']
 
 # start token pattern, end token pattern, end_token_for_start_token function.
 branch_rules = (
@@ -55,6 +59,11 @@ class Tree(tuple):
   def __str__(self):
     return ''.join(str(el) for el in self)
 
+  def __getitem__(self, key):
+    if isinstance(key, slice):
+      return type(self)(*super().__getitem__(key))
+    return super().__getitem__(key)
+
   name = 'Tree'
   ansi_color = ''
   ansi_reset = ''
@@ -62,6 +71,15 @@ class Tree(tuple):
   @property
   def has_flawed_els(self):
     return any(isinstance(el, TreeFlawed) for el in subs)
+
+
+  def walk(self, predicate=is_str):
+    for el in self:
+      if predicate(el):
+        yield el
+      elif isinstance(el, Tree):
+        yield from el.walk(predicate=predicate)
+
 
   def _str_indented(self, res, depth):
     'multiline indented description helper.'
@@ -104,12 +122,15 @@ class TreeUnterminated(TreeFlawed):
   ansi_reset = RST_TXT
 
 
-def _parse_tree(text, match_stream, pos, depth, subs, end_token, parent_end_token):
+def _parse_tree(leaf_replacements, text, match_stream, pos, depth, subs, end_token, parent_end_token):
+
+  def append_leaf(leaf):
+    subs.append(leaf_replacements.get(leaf, leaf))
 
   def flush_leaf(pos, end_index):
     leaf_text = text[pos:end_index]
     if leaf_text:
-      subs.append(leaf_text)
+      append_leaf(leaf_text)
 
   for match in match_stream:
     flush_leaf(pos, match.start())
@@ -117,10 +138,10 @@ def _parse_tree(text, match_stream, pos, depth, subs, end_token, parent_end_toke
     token = match.group()
     match_index = match.lastindex # only start and end tokens have a group.
     if match_index is None: # leaf token.
-      subs.append(token)
+      append_leaf(token)
     elif match_index <= num_choices: # found a start token (groups are 1-indexed).
       sub_end_token = end_for_start_fns[match_index - 1](token)
-      sub, pos = _parse_tree(text, match_stream, pos, depth + 1,
+      sub, pos = _parse_tree(leaf_replacements, text, match_stream, pos, depth + 1,
         subs=[token], parent_end_token=end_token, end_token=sub_end_token)
       subs.append(sub)
     elif token == end_token:
@@ -137,9 +158,9 @@ def _parse_tree(text, match_stream, pos, depth, subs, end_token, parent_end_toke
   return Tree(*subs) if end_token is None else TreeUnterminated(*subs), len(text)
 
 
-def parse_tree(text):
+def parse_tree(text, leaf_replacements=None):
   match_stream = IterBuffer(lexer.finditer(text))
-  res, pos = _parse_tree(text, match_stream, pos=0, depth=0,
+  res, pos = _parse_tree(leaf_replacements or {}, text, match_stream, pos=0, depth=0,
     subs=[], parent_end_token=None, end_token=None)
   return res
 

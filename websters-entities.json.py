@@ -75,7 +75,7 @@ manual = {
   'yogh'      : 'ȝ', # LATIN SMALL LETTER YOGH.
   'til'       : '~', # guess.
   'oomac'     : 'ꝏ\u0304', # LATIN SMALL LETTER OO, COMBINING MACRON. guess.
-  '/amacr'    : 'a\u0304', # COMBINING MACRON. looks like slash is just a typo.
+  '/amacr'    : 'a\u0304', # COMBINING MACRON. looks like the slash is just a typo.
   
   'frac00'        : '0/0',
   'frac1000x1434' : '1000/1434',

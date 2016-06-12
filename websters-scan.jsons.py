@@ -13,13 +13,14 @@ buffer = []
 
 for line_raw in err_progress(lines, 'lines'):
   line = line_raw.rstrip()
-  if line.find('<hw>') != -1: # head line.
+  if re.match(r'(\{\s*)?<hw>', line): # head line.
     if buffer:
       out_json(buffer)
       del buffer[:]
     checkF(line.find('</hw>') != -1, 'head is missing /hw tag: {!r}', line)
   else: # tail line.
-    checkF(line.find('</hw>') == -1, 'tail contains /hw tag: {!r}', line)
+    if line.find('<hw>') != -1:
+      errFL('\nnon-head line contains hw tag:\n{}', line)
   buffer.append(line)
 
 assert buffer
