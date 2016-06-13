@@ -6,7 +6,7 @@ import re
 from pithy import *
 
 
-with Transformer(muck.source('websters-p-misc.txt'), log_stem=argv[1]) as t:
+with muck.transform('websters-p-misc.txt') as t:
 
   @t.drop
   def alphabet_headers(line):
