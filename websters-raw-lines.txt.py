@@ -20,6 +20,12 @@ with muck.transform('websters-p-misc.txt') as t:
   def page_num_inlines(line):
     return re.sub(r'<![^>]*>', '', line)
 
+  @t.edit
+  def bracket_slash_lt_mark(line):
+    # this sequence appears in some of the pronunciations,
+    # and the bracket breaks parsing.
+    return re.sub(r'\]/>', '', line)
+
   @t.conv
   def br_tags(line):
     # br is the only tag in use that does not have a matching close tag.

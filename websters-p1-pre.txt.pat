@@ -199,9 +199,11 @@ websters-p0-para.txt
 + <pre>      .      . .     . . . .   etc.    1, 4, 10, 20, etc</pre><BR>
 + <pre> .   . .   . . . .  . . . . .</pre><BR>
 
+| <i>Avogadro</i>, an Italian scientist. Sometimes called
+| <i>Amp&egrave;re's law</i>.</cd> -- <col><b>Bode's law</b></col>
 | <i>(Astron.)</i>, <cd>an approximative empirical expression of the
-| distances of the planets from the sun, as follows: -- </p>
-| 
+- distances of the planets from the sun, as follows: -- </p>
+- 
 - <p><table><pre>
 - <row>Mer. Ven. Earth. Mars.  Aste.  Jup.  Sat.  Uran.   Nep.</row>
 - <row> 4    4     4     4      4      4     4      4      4</row>
@@ -210,14 +212,18 @@ websters-p0-para.txt
 - <row> 4    7    10    16     28     52   100     196   388</row>
 - <row> 5.9  7.3  10    15.2   27.4   52    95.4   192   300</row>
 - </pre></table></p>
-+ <p><table>
+- 
+- <p>where each distance (line third) is the sum of 4 and a multiple of
++ distances of the planets from the sun, as follows: --
++ <table>
 + <row><pre>Mer. Ven. Earth. Mars.  Aste.  Jup.  Sat.  Uran.   Nep.</pre></row>
 + <row><pre> 4    4     4     4      4      4     4      4      4</pre></row>
 + <row><pre> 0    3     6    12     24     48    96     192   384</pre></row>
 + <row><pre> --   --   --    --     --     --    --     ---   ---</pre></row>
 + <row><pre> 4    7    10    16     28     52   100     196   388</pre></row>
 + <row><pre> 5.9  7.3  10    15.2   27.4   52    95.4   192   300</pre></row>
-+ </table></p>
++ </table>
++ where each distance (line third) is the sum of 4 and a multiple of
 
 | so that sums and differences of the former indicate respectively
 | products and quotients of the latter; thus,<BR>

@@ -10,17 +10,19 @@ from pithy import *
 from pithy.ansi import *
 
 
-__all__ = [
-  'entity_replacements', 'parse_tree',
-  'Tree', 'TreeFlawed', 'TreeUnexpected', 'TreeUnterminated',
-]
-
-
 entity_replacements = muck.source('websters-entities.json')
 
 
-# note: this entities pattern is equivalent to that in websters-entities.
-leaf_choices = [r'\s+', r'&[^;\s]*;']
+space_pattern = r'\s+'
+word_pattern = r"[-'\w]+"
+pronunciation_pattern = r'["*`|/]+'
+entity_pattern = r'&[^;\s]*;' # note: this is equivalent to that in websters-entities.txt.py.
+
+# any characters not matched by these patterns will be lexed together into a leaf token as well.
+leaf_choices = [space_pattern, word_pattern, pronunciation_pattern, entity_pattern]
+
+# this regex matches tokens for 'clean' words, omitting the pronunciation punctuation.
+clean_word_token_re = re.compile('|'.join((space_pattern, word_pattern)))
 
 # start token pattern, end token pattern, end_token_for_start_token function.
 branch_rules = (
@@ -57,7 +59,7 @@ class Tree(tuple):
     return '{}({})'.format(type(self).__name__, ', '.join(repr(el) for el in self))
 
   def __str__(self):
-    return ''.join(str(el) for el in self)
+    return ''.join(self.walk_all())
 
   def __getitem__(self, key):
     if isinstance(key, slice):
@@ -69,57 +71,107 @@ class Tree(tuple):
   ansi_reset = ''
 
   @property
+  def is_flawed(self):
+    return isinstance(self, TreeFlawed) or self.has_flawed_els
+
+  @property
   def has_flawed_els(self):
-    return any(isinstance(el, TreeFlawed) for el in subs)
+    return any(isinstance(el, Tree) and el.is_flawed for el in self)
+
+  @property
+  def contents(self):
+    if len(self) < 2: raise ValueError('bad Tree: {!r}'.format(self))
+    return islice(self, 1, len(self) - 1) # omit start and end tag.
 
 
-  def walk(self, predicate=is_str):
+  def walk_all(self):
     for el in self:
-      if predicate(el):
+      if is_str(el):
         yield el
-      elif isinstance(el, Tree):
-        yield from el.walk(predicate=predicate)
+      else:
+        yield from el.walk_all()
 
 
-  def _str_indented(self, res, depth):
+  def walk_contents(self):
+    for el in self.contents:
+      if is_str(el):
+        yield el
+      else:
+        yield from el.walk_contents()
+
+  
+  def walk_branches(self, should_enter_tag_fn=lambda tag: True):
+    for el in self:
+      if isinstance(el, Tree):
+        yield el
+        if should_enter_tag_fn(el[0]):
+          yield from el.walk_branches(should_enter_tag_fn=should_enter_tag_fn)
+
+
+  def _structured_desc(self, res, depth):
     'multiline indented description helper.'
     if self.ansi_color: res.append(self.ansi_color)
     res.append(self.name)
     res.append(':')
     if self.ansi_reset: res.append(self.ansi_reset)
-
-    if all(isinstance(el, str) for el in self):
-      for el in self:
-        res.append(' ')
+    d = depth + 1
+    nest_spacer = '\n' + ('  ' * d)
+    spacer = ' ' # the spacer to use for string tokens.
+    for el in self:
+      if is_str(el):
+        if spacer: res.append(spacer)
         res.append(repr(el))
-    else:
-      d = depth + 1
-      for el in self:
-        res.append('\n')
-        res.append('  ' * d)
-        if isinstance(el, str): res.append(repr(el))
-        else: el._str_indented(res, d)
+        spacer = ''
+      else:
+        res.append(nest_spacer)
+        el._structured_desc(res, d)
+        spacer = nest_spacer
 
-  def str_indented(self, depth=0):
+  def structured_desc(self, depth=0):
     res = []
-    self._str_indented(res, depth)
+    self._structured_desc(res, depth)
     return ''.join(res)
 
 
+class TreeRoot(Tree):
+  name = 'Root'
+  @property
+  def contents(self):
+    return self # no tags at root level.
+
+
 class TreeFlawed(Tree):
-  name = 'Flawed'
-  ansi_color = TXT_Y
-  ansi_reset = RST_TXT
+  'abstract parent of the various flaw types.'
+  pass
+
 
 class TreeUnexpected(TreeFlawed):
+  'unexpected trees consist solely of an unpaired closing tag.'
+
   name = 'Unexpected'
   ansi_color = TXT_R
   ansi_reset = RST_TXT
 
+  def __new__(cls, *args):
+    assert len(args) == 1
+    return super().__new__(cls, *args)
+
+  @property
+  def contents(self):
+    assert len(self) == 1
+    return ()
+  
+
 class TreeUnterminated(TreeFlawed):
+  'unterminated trees are missing a closing tag.'
+
   name = 'Unterminated'
   ansi_color = TXT_M
   ansi_reset = RST_TXT
+
+  @property
+  def contents(self):
+    return islice(self, 1, len(self)) # omit the start tag only.
 
 
 def _parse_tree(leaf_replacements, text, match_stream, pos, depth, subs, end_token, parent_end_token):
@@ -146,8 +198,7 @@ def _parse_tree(leaf_replacements, text, match_stream, pos, depth, subs, end_tok
       subs.append(sub)
     elif token == end_token:
       subs.append(token)
-      res = (TreeFlawed(*subs) if any(isinstance(el, TreeFlawed) for el in subs) else Tree(*subs))
-      return res, pos
+      return Tree(*subs), pos
     elif token == parent_end_token: # parent end; missing end token.
       match_stream.push(match) # put the parent end token back into the stream.
       return TreeUnterminated(*subs), pos
@@ -155,7 +206,7 @@ def _parse_tree(leaf_replacements, text, match_stream, pos, depth, subs, end_tok
       subs.append(TreeUnexpected(token))
   # end.
   flush_leaf(pos, len(text))
-  return Tree(*subs) if end_token is None else TreeUnterminated(*subs), len(text)
+  return TreeRoot(*subs) if depth == 0 else TreeUnterminated(*subs), len(text)
 
 
 def parse_tree(text, leaf_replacements=None):
