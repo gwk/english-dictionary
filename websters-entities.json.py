@@ -34,7 +34,7 @@ ent_xhtml = std_entities.entitydefs
 
 
 manual = {
-  '?'       : '(?)',
+  '?'       : '«?»',
 
   'CHI'     : 'Χ', # GREEK CAPITAL LETTER CHI.
   'DELTA'   : 'Δ', # GREEK CAPITAL LETTER DELTA.
@@ -48,26 +48,26 @@ manual = {
   'THETA'   : 'Θ', # GREEK CAPITAL LETTER THETA.
   'UPSILON' : 'Υ', # GREEK CAPITAL LETTER UPSILON.
 
-  'Aquarius'    : '(Aquarius)',
-  'Aries'       : '(Aries)',
-  'Cancer'      : '(Cancer)',
-  'Capricorn'   : '(Capricorn)',
-  'Jupiter'     : '(Jupiter)',
-  'Leo'         : '(Leo)',
-  'Libra'       : '(Libra)',
-  'Pisces'      : '(Pisces)',
-  'Sagittarius' : '(Sagittarius)',
-  'Scorpio'     : '(Scorpio)',
-  'Sun'         : '(Sun)',
-  'Taurus'      : '(Taurus)',
-  'Virgo'       : '(Virgo)',
+  'Aquarius'    : '«Aquarius»',
+  'Aries'       : '«Aries»',
+  'Cancer'      : '«Cancer»',
+  'Capricorn'   : '«Capricorn»',
+  'Jupiter'     : '«Jupiter»',
+  'Leo'         : '«Leo»',
+  'Libra'       : '«Libra»',
+  'Pisces'      : '«Pisces»',
+  'Sagittarius' : '«Sagittarius»',
+  'Scorpio'     : '«Scorpio»',
+  'Sun'         : '«Sun»',
+  'Taurus'      : '«Taurus»',
+  'Virgo'       : '«Virgo»',
 
-  'libra'       : '(Libra)',
-  'mercury'     : '(Mercury)',
-  'sagittarius' : '(Sagittarius)',
-  'scorpio'     : '(Scorpio)',
-  'taurus'      : '(Taurus)',
-  'pisces'      : '(Pisces)',
+  'libra'       : '«Libra»',
+  'mercury'     : '«Mercury»',
+  'sagittarius' : '«Sagittarius»',
+  'scorpio'     : '«Scorpio»',
+  'taurus'      : '«Taurus»',
+  'pisces'      : '«Pisces»',
   
   'asterism'  : '⁂', # ASTERISM.
   'cuberoot'  : '∛', # CUBE ROOT.
@@ -164,7 +164,7 @@ def get_trans(e):
   d = micra_webfont_entity_descriptions.get(e)
   if d: errFL('micra webfont note: {}', d)
 
-  return '({}?)'.format(e)
+  return '«{}»'.format(e)
 
 # prefer composed characters over combining sequences.
 trans = { '&{};'.format(e) : unicodedata.normalize('NFC', get_trans(e)) for e in entities }
