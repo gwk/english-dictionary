@@ -1,3 +1,6 @@
+# check that all parse trees have no flaws (they should all be fixed in the patches).
+# additionally, make sure that the trees are really lossless representations of source strings.
+
 import muck
 
 from parsing import *

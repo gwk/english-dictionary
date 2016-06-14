@@ -1,4 +1,4 @@
-# find all '<…>' tags in the text and output a list.
+# count all '<…>' tags in the text and sort by count, then name.
 
 import muck
 import re

@@ -22,6 +22,13 @@ with muck.transform('websters-p-misc.txt') as t:
 
   @t.conv
   def br_tags(line):
+    # br is the only tag in use that does not have a matching close tag.
+    # we do the easy thing, which is to use the modern NewLine entity;
+    # alternatively we could add handling for the modern <…/> tag syntax,
+    # and fix all of the br tags to use it, or add a special case to the parser.
+    # this conversion introduces a large number of changes to the text,
+    # but since the tag was presumably inserted by the typists,
+    # and the newline entity has equivalent semantic value, this seems like the best choice.
     return re.sub(r'<BR>', '&NewLine;', line)
 
   t.put(outZ)
