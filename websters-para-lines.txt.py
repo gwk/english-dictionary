@@ -10,6 +10,7 @@ text = muck.source('websters-raw-lines.txt')
 
 
 def is_leading_space_ok(line):
+  'incomplete attempt to validate leading space.'
   return any(re.fullmatch(p, line) for p in [
     r' +<i>[^<]+</i>(</blockquote>)?', # common for quote attributions.
     r' \. \. \. .+',
@@ -45,14 +46,14 @@ for i, line in enumerate(text, 1):
   if is_closed:
     line = line[:-4] # strip closing p tag.
   
-  if line:
-    # both leading and trailing space cases seem legitimate; leave alone for now.
-    #checkF(not line[0].isspace() or is_leading_space_ok(line), 'leading space')
-    #checkF(not line[-1].isspace(), 'trailing space')
-    lines.append(line.strip())
+  # both leading and trailing space cases seem legitimate.
+  #checkF(not line[0].isspace() or is_leading_space_ok(line), 'leading space')
+  #checkF(not line[-1].isspace(), 'trailing space')
+  lines.append(line.strip())
 
   if is_closed:
-    if lines:
-      outL(' '.join(lines))
+    joined = ' '.join(l for l in lines if l)
+    if joined:
+      outL(joined)
     del lines [:]
     in_para = False
