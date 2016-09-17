@@ -4,7 +4,8 @@
 import muck
 
 from parsing import *
-from pithy import *
+from pithy.io import err_progress
+
 
 tag_start_re = re.compile(r'[[({]|<([^/>]*)>')
 tag_end_re = re.compile(r'[])}]|</([^>]*)>')

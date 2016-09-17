@@ -3,7 +3,7 @@
 import muck
 import re
 
-from pithy import *
+from pithy.io import outZ
 
 
 with muck.transform('websters-p-misc.txt') as t:
@@ -26,7 +26,7 @@ with muck.transform('websters-p-misc.txt') as t:
     # and the bracket breaks parsing.
     return re.sub(r'\]/>', '', line)
 
-  @t.conv
+  @t.convert
   def br_tags(line):
     # br is the only tag in use that does not have a matching close tag.
     # we do the easy thing, which is to use the modern NewLine entity;

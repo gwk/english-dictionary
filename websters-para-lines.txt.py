@@ -3,7 +3,7 @@
 import muck
 import re
 
-from pithy import *
+from pithy.io import outL
 
 
 text = muck.source('websters-raw-lines.txt')

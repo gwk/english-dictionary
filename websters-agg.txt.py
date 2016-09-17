@@ -4,7 +4,7 @@
 
 import muck
 from string import digits, ascii_letters, punctuation
-from pithy import *
+from pithy.io import errFL, err_progress, outZ
 
 sources = [
   (660, 'ab'),

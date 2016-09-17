@@ -2,7 +2,7 @@
 
 # the webfont.txt document provides a translation table,
 # but my effort to use it programmatically proved useless;
-# of the nonstandard entities found, the table provided now helpful translations.
+# of the nonstandard entities found, the table provided no helpful translations.
 # it does however offer insight into what characters they stand for;
 # this script constructs replacements as needed.
 
@@ -11,7 +11,8 @@ import html.entities as std_entities
 import muck
 import unicodedata
 
-from pithy import *
+from pithy.io import errFL, outL, out_json
+from pithy.string_utils import clip_suffix
 
 
 # this dictionary was transcribed from the micra webfont.txt documentation file.
@@ -130,7 +131,7 @@ guess_pairs = [
 known_multichars = {
   'oe' : 'œ', # LATIN SMALL LIGATURE OE.
   'ae' : 'æ', # LATIN SMALL LETTER AE.
-  'oo' : 'ꝏ' # LATIN SMALL LETTER OO. unfortunately this appears to be a double-width character.
+  'oo' : 'ꝏ' # LATIN SMALL LETTER OO. unfortunately this appears to be a double-width character in OSX monospace fonts.
 }
 
 def guess_trans(e):

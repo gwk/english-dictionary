@@ -2,12 +2,14 @@
 # the custom parser reports mismatched tags.
 # it also lexes entities and whitespace while preserving the original data exactly.
 
-import pithy.meta as meta
 import muck
 import re
 
-from pithy import *
-from pithy.ansi import *
+from itertools import chain, islice
+
+from pithy.ansi import RST_TXT, TXT_M, TXT_R
+from pithy.seq import IterBuffer
+from pithy.type_util import is_str
 
 
 entity_replacements = muck.source('websters-entities.json')

@@ -3,8 +3,12 @@
 import muck
 import re
 
+from collections import namedtuple
+from pithy.dict_utils import DefaultByKeyDict
+from pithy.io import err_progress, out_json
+from pithy.type_util import is_str
 from parsing import *
-from pithy import *
+
 
 
 WordDefns = namedtuple('WordDefns', 'base words defns')
