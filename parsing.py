@@ -99,7 +99,7 @@ class Tree(tuple):
       else:
         yield from el.walk_contents()
 
-  
+
   def walk_branches(self, should_enter_tag_fn=lambda tag: True):
     for el in self:
       if isinstance(el, Tree):
@@ -160,7 +160,7 @@ class TreeUnexpected(TreeFlawed):
   def contents(self):
     assert len(self) == 1
     return ()
-  
+
 
 class TreeUnterminated(TreeFlawed):
   'unterminated trees are missing a closing tag.'

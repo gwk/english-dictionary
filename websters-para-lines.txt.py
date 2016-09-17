@@ -45,7 +45,7 @@ for i, line in enumerate(text, 1):
   is_closed = line.endswith('</p>')
   if is_closed:
     line = line[:-4] # strip closing p tag.
-  
+
   # both leading and trailing space cases seem legitimate.
   #checkF(not line[0].isspace() or is_leading_space_ok(line), 'leading space')
   #checkF(not line[-1].isspace(), 'trailing space')

@@ -68,7 +68,7 @@ manual = {
   'scorpio'     : '«Scorpio»',
   'taurus'      : '«Taurus»',
   'pisces'      : '«Pisces»',
-  
+
   'asterism'  : '⁂', # ASTERISM.
   'cuberoot'  : '∛', # CUBE ROOT.
   'umlaut'    : '¨', # DIAERESIS.
@@ -76,7 +76,7 @@ manual = {
   'til'       : '~', # guess.
   'oomac'     : 'ꝏ\u0304', # LATIN SMALL LETTER OO, COMBINING MACRON. guess.
   '/amacr'    : 'a\u0304', # COMBINING MACRON. looks like the slash is just a typo.
-  
+
   'frac00'        : '0/0',
   'frac1000x1434' : '1000/1434',
   'frac12x13'     : '12/13',
