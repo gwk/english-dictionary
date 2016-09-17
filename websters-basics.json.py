@@ -7,7 +7,7 @@ from collections import namedtuple
 from pithy.dict_utils import DefaultByKeyDict
 from pithy.io import err_progress, out_json
 from pithy.type_util import is_str
-from parsing import *
+from parsing import clean_word_token_re, word_re, entity_replacements, parser
 
 
 
@@ -26,7 +26,7 @@ def clean_hw_word(tree):
   return ''.join(tokens).strip()
 
 def clean_defn_words(tree):
-  return [el for el in tree.walk_contents() if re.fullmatch(word_pattern, el)]
+  return [el for el in tree.walk_contents() if word_re.fullmatch(el)]
 
 
 for record in err_progress(muck.source('websters-scan.jsons')):
@@ -48,7 +48,7 @@ for record in err_progress(muck.source('websters-scan.jsons')):
         digest_tree(el)
 
   for para in record:
-    tree = parse_tree(para, leaf_replacements=entity_replacements)
+    tree = parser.parse(para, leaf_replacements=entity_replacements)
     digest_tree(tree)
 
   assert words

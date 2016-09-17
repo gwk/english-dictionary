@@ -2,9 +2,11 @@
 # additionally, make sure that the trees are really lossless representations of source strings.
 
 import muck
+import re
 
-from parsing import *
-from pithy.io import err_progress
+from parsing import parser
+
+from pithy.io import err_progress, checkF, failF
 
 
 tag_start_re = re.compile(r'[[({]|<([^/>]*)>')
@@ -13,7 +15,7 @@ tag_end_re = re.compile(r'[])}]|</([^>]*)>')
 
 for record in err_progress(muck.source('websters-scan.jsons')):
   for para in record:
-    tree = parse_tree(para)
+    tree = parser.parse(para)
 
     def checkF(cond, fmt, *items):
       if not cond:
@@ -21,7 +23,7 @@ for record in err_progress(muck.source('websters-scan.jsons')):
 
     checkF(not tree.is_flawed, 'flawed paragraph:')
 
-    # the remaining checks are meant to validate the implementation of Tree.
+    # the remaining checks are meant to validate the implementation of tag_tree.
 
     s = str(tree)
     checkF(s == para, 'bad tree str:\n{}', s)
