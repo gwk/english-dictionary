@@ -23,10 +23,10 @@ bases = DefaultByKeyDict(lambda base: WordDefns(base, set(), set()))
 
 def clean_hw_word(tree):
   tokens = [el for el in tree.walk_contents() if clean_word_token_re.fullmatch(el)]
-  return ''.join(tokens).strip()
+  return ''.join(tokens).strip().lower()
 
 def clean_defn_words(tree):
-  return [el for el in tree.walk_contents() if word_re.fullmatch(el)]
+  return [el.lower() for el in tree.walk_contents() if word_re.fullmatch(el)]
 
 
 for record in err_progress(muck.source('websters-scan.jsons')):
