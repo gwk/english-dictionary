@@ -3,7 +3,7 @@
 import muck
 import re
 
-from collections import namedtuple
+from collections import Counter, namedtuple
 from pithy.dict_utils import DefaultByKeyDict
 from pithy.io import err_progress, out_json
 from pithy.type_util import is_str
@@ -26,7 +26,7 @@ def clean_hw_word(tree):
   return ''.join(tokens).strip().lower()
 
 def clean_defn_words(tree):
-  return [el.lower() for el in tree.walk_contents() if word_re.fullmatch(el)]
+  return Counter(el.lower() for el in tree.walk_contents() if word_re.fullmatch(el))
 
 
 for record in err_progress(muck.source('websters-scan.jsons')):
