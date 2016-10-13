@@ -29,7 +29,7 @@ def clean_defn_words(tree):
   return Counter(el.lower() for el in tree.walk_contents() if word_re.fullmatch(el))
 
 
-for record in err_progress(muck.source('websters-scan.jsons')):
+for record in err_progress(muck.source('wb/scan.jsons')):
   words = []
   defns = set()
   other = set()

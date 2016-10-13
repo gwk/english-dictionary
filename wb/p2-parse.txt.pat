@@ -1,5 +1,5 @@
 pat v0
-websters-p1-pre.txt
+wb/p1-pre.txt
 
 | time.</def> "I will <i>abide</i> the coming of my lord."
 | <i>Tennyson.</i></p>

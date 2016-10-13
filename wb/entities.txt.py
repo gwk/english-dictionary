@@ -16,7 +16,7 @@ import re
 from pithy.io import checkF, outL
 
 
-text = muck.source('websters-raw-lines.txt')
+text = muck.source('wb/raw-lines.txt')
 
 entities = set()
 

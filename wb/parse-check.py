@@ -13,7 +13,7 @@ tag_start_re = re.compile(r'[[({]|<([^/>]*)>')
 tag_end_re = re.compile(r'[])}]|</([^>]*)>')
 
 
-for record in err_progress(muck.source('websters-scan.jsons')):
+for record in err_progress(muck.source('wb/scan.jsons')):
   for para in record:
     tree = parser.parse(para)
 

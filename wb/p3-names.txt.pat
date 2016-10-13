@@ -1,5 +1,5 @@
 pat v0
-websters-p2-parse.txt
+wb/p2-parse.txt
 
 | <p><blockquote>Sweet birds <i>antheming</i> the morn.<BR>
 | <i>Keats.</i></blockquote></p>

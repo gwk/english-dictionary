@@ -6,7 +6,7 @@ import re
 from pithy.io import outZ
 
 
-with muck.transform('websters-p-misc.txt') as t:
+with muck.transform('wb/p-misc.txt') as t:
 
   @t.drop
   def alphabet_headers(line):

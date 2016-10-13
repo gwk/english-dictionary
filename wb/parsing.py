@@ -13,12 +13,12 @@ from pithy.tag_parse import TagRule, TagParser
 from pithy.type_util import is_str
 
 
-entity_replacements = muck.source('websters-entities.json')
+entity_replacements = muck.source('wb/entities.json')
 
 space_pattern = r'\s+'
 word_pattern = r"[-'\w]+"
 pronunciation_pattern = r'["*`|/]+'
-entity_pattern = r'&[^;\s]*;' # note: this is equivalent to that in websters-entities.txt.py.
+entity_pattern = r'&[^;\s]*;' # note: this is equivalent to that in wb/entities.txt.py.
 
 # this regex matches tokens for 'clean' words, omitting the pronunciation punctuation.
 clean_word_token_re = re.compile('|'.join((space_pattern, word_pattern)))

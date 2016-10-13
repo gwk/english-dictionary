@@ -1,5 +1,5 @@
 pat v0
-websters-agg.txt
+wb/agg.txt
 
 | 
 | <p><col><b>Full canonicals</b></col>, <cd>the complete costume of

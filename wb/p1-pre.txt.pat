@@ -1,5 +1,5 @@
 pat v0
-websters-p0-para.txt
+wb/p0-para.txt
 
 | some simpler body or bodies. In formulas, the elements are designated
 | by abbreviations of their names in Latin or New Latin.</p>

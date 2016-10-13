@@ -18,10 +18,10 @@ from pithy.string_utils import clip_suffix
 # this dictionary was transcribed from the micra webfont.txt documentation file.
 # it served as the hints with which some entities below were created by hand.
 micra_webfont_entity_descriptions = { k.strip(' *</') : v for (k, v) in \
-  muck.source('micra-webfont-entities.json').items() }
+  muck.source('wb/micra-webfont-entities.json').items() }
 
 # all the found entities.
-entities = [line.strip() for line in muck.source('websters-entities.txt')]
+entities = [line.strip() for line in muck.source('wb/entities.txt')]
 
 # the html5 entities dictionary has some keys without semicolons;
 # ignore these (overly loose / modern for our purposes),

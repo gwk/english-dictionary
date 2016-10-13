@@ -7,7 +7,7 @@ import muck
 from pithy.io import checkF, errFL, err_progress, out_json
 
 
-lines = muck.source('websters-para-lines.txt')
+lines = muck.source('wb/para-lines.txt')
 
 buffer = []
 

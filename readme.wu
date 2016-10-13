@@ -51,7 +51,7 @@ The following is a brief description of the pipeline thus far.
 
 ## Aggregate
 
-The first step is to download the eleven texts, drop the documentation at the top of each file, and check that no odd characters are in the text, resulting in `websters-agg.txt`.
+The first step is to download the eleven texts, drop the documentation at the top of each file, and check that no odd characters are in the text, resulting in `wb/agg.txt`.
 
 ## Paragraph Lines
 
@@ -63,7 +63,7 @@ The scan step simply groups each "head" paragraph containing `<hw>` tags (which 
 
 ## Entities
 
-The SGML contains many nonstandard entity sequences; I have attempted to build a translation dictionary in `websters-entities.json.py`, but it is incomplete.
+The SGML contains many nonstandard entity sequences; I have attempted to build a translation dictionary in `wb/entities.json.py`, but it is incomplete.
 
 ## Parse
 

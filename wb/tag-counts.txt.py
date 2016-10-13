@@ -6,7 +6,7 @@ import re
 from pithy import *
 
 
-text = muck.source('websters-para-lines.txt')
+text = muck.source('wb/para-lines.txt')
 
 tags = Counter()
 
