@@ -1,12 +1,12 @@
-# find all '&…;' entity sequences in the text and output a list.
-# the micra text used SGML/ISO-8879 encodings, plus many nonstandard ones.
+# Find all '&…;' entity sequences in the text and output a list.
+# The micra text used SGML/ISO-8879 encodings, plus many nonstandard ones.
 
-# however the webfont.txt document also states:
+# However the webfont.txt document also states:
 # | Note that the symbols used here are in some cases abbreviations
 # | (for compactness) of the ISO 8879 recommended symbols.
 
-# webfont.txt also states that an escape syntax '<xx/' is used;
-# while these appear in the PG 29765.utf8 text,
+# webfont.txt also states that an escape syntax '<xx/' is used.
+# While these appear in the PG 29765.utf8 text,
 # this syntax is not present in the 0.50 texts, as shown by the assertion;
 # presumably they were converted to entity syntax.
 

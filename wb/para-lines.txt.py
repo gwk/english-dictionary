@@ -1,4 +1,4 @@
-# parse the aggregated gutenberg text by coalesting top-level <p> blocks into single lines.
+# Parse the aggregated gutenberg text by coalesting top-level <p> blocks into single lines.
 
 import muck
 import re

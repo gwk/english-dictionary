@@ -1,6 +1,6 @@
-# download and aggregate the raw text sources.
-# use the original MICRA v0.50 sources hosted at Project Gutenberg;
-# the other versions have been processed and seem to have lost some fidelity.
+# Download and aggregate the raw text sources.
+# Use the original MICRA v0.50 sources hosted at Project Gutenberg;
+# The other versions on Project Gutenberg have been post-processed and seem to have lost some fidelity.
 
 import muck
 from string import digits, ascii_letters, punctuation

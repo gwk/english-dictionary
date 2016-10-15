@@ -1,4 +1,4 @@
-# fix up the patched aggregate text, producing the final raw lines.
+# Fix up the patched aggregate text, producing the final raw lines.
 
 import muck
 import re

@@ -1,5 +1,5 @@
-# parse the paragraph lines into records.
-# this step groups multiple '<p>' tag lines of text by looking for the '<hw>' tag.
+# Parse the paragraph lines into records.
+# This step groups multiple '<p>' tag lines of text by looking for the '<hw>' tag.
 
 import re
 import muck

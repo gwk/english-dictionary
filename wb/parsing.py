@@ -1,6 +1,5 @@
-# SGML parser.
-# the custom parser reports mismatched tags.
-# it also lexes entities and whitespace while preserving the original data exactly.
+# SGML parser using TagParser.
+# It lexes entities and whitespace while preserving the original data exactly.
 
 import muck
 import re

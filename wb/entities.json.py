@@ -1,10 +1,10 @@
-# create a translation table for the entities found in the text.
+# Create a translation table for the entities found in the text.
 
-# the webfont.txt document provides a translation table,
+# The webfont.txt document provides a translation table,
 # but my effort to use it programmatically proved useless;
 # of the nonstandard entities found, the table provided no helpful translations.
-# it does however offer insight into what characters they stand for;
-# this script constructs replacements as needed.
+# It does however offer insight into what characters they stand for;
+# This script constructs replacements as needed.
 
 
 import html.entities as std_entities
