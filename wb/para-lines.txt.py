@@ -19,6 +19,7 @@ def is_leading_space_ok(line):
 
 lines = [] # buffer to aggregate raw lines into a single logical line.
 in_para = False
+ws_re = re.compile(r'\s')
 
 for i, line in enumerate(text, 1):
 
@@ -32,6 +33,10 @@ for i, line in enumerate(text, 1):
   if line == '\n':
     checkF(not in_para, 'empty line inside paragraph')
     continue
+
+  for m in ws_re.finditer(line):
+    ws = m.group(0)
+    assert ws == ' ' or ws == '\n'
 
   line = line[:-1] # remove newline.
 
