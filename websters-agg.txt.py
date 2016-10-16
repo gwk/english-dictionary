@@ -1,7 +1,8 @@
 # download and aggregate the raw text sources.
 # use the original MICRA v0.50 sources hosted at Project Gutenberg;
 # the other versions have been processed and seem to have lost some fidelity.
-
+import sys
+print(sys.version, file = sys.stderr)
 import muck
 from string import digits, ascii_letters, punctuation
 from pithy.io import errFL, err_progress, outZ
