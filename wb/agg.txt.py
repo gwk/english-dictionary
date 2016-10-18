@@ -24,7 +24,7 @@ clean_chars = set(digits + ascii_letters + punctuation + ' \n')
 
 for ebook_num, letters in sources:
   url = 'http://www.gutenberg.org/files/{}/old/pgw050{}.txt'.format(ebook_num, letters)
-  file = muck.source_url(url, delay=1, encoding='latin_1')
+  file = muck.load_url(url, delay=1, encoding='latin_1')
 
   # skip the header.
   for i, line in enumerate(file):

@@ -4,10 +4,11 @@
 import re
 import muck
 
-from pithy.io import checkF, errFL, err_progress, out_json
+from pithy.io import *
+from pithy.json_utils import out_json
 
 
-lines = muck.source('wb/para-lines.txt')
+lines = muck.load('wb/para-lines.txt')
 
 buffer = []
 

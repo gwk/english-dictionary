@@ -6,7 +6,7 @@ import re
 from pithy.io import outL
 
 
-text = muck.source('wb/raw-lines.txt')
+text = muck.load('wb/raw-lines.txt')
 
 
 def is_leading_space_ok(line):

@@ -12,7 +12,7 @@ from pithy.tag_parse import TagRule, TagParser
 from pithy.type_util import is_str
 
 
-entity_replacements = muck.source('wb/entities.json')
+entity_replacements = muck.load('wb/entities.json')
 
 space_pattern = r'\s+'
 word_pattern = r"[-'\w]+"

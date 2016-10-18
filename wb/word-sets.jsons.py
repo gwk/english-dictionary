@@ -5,12 +5,13 @@ import re
 
 from collections import namedtuple
 from pithy.dict_utils import DefaultByKeyDict
-from pithy.io import errFL, err_progress, out_json
+from pithy.io import *
+from pithy.json_utils import out_json
 from pithy.type_util import is_str
 from parsing import clean_word_token_re, word_re, entity_replacements, parser
 
-scans = muck.source('wb/scan.jsons')
-stopwords = set(muck.source('stopwords.json'))
+scans = muck.load('wb/scan.jsons')
+stopwords = set(muck.load('stopwords.json'))
 
 
 # Words and definitions have a many-to-many relationship.

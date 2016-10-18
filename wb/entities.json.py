@@ -11,17 +11,18 @@ import html.entities as std_entities
 import muck
 import unicodedata
 
-from pithy.io import errFL, outL, out_json
+from pithy.io import *
+from pithy.json_utils import out_json
 from pithy.string_utils import clip_suffix
 
 
 # this dictionary was transcribed from the micra webfont.txt documentation file.
 # it served as the hints with which some entities below were created by hand.
 micra_webfont_entity_descriptions = { k.strip(' *</') : v for (k, v) in \
-  muck.source('wb/micra-webfont-entities.json').items() }
+  muck.load('wb/micra-webfont-entities.json').items() }
 
 # all the found entities.
-entities = [line.strip() for line in muck.source('wb/entities.txt')]
+entities = [line.strip() for line in muck.load('wb/entities.txt')]
 
 # the html5 entities dictionary has some keys without semicolons;
 # ignore these (overly loose / modern for our purposes),
