@@ -6,7 +6,7 @@ import re
 from collections import namedtuple
 from pithy.dict_utils import DefaultByKeyDict
 from pithy.io import *
-from pithy.json_utils import out_json
+from pithy.json_utils import out_jsonl
 from pithy.type_util import is_str
 from parsing import clean_word_token_re, word_re, entity_replacements, parser
 
@@ -77,4 +77,4 @@ errFL('bases: {}; words: {}; multiwords (keys containing spaces): {}',
   len(bases), len(word_bases), multiword_count)
 
 for base in bases.values():
-  out_json(base)
+  out_jsonl(base)
