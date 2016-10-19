@@ -10,6 +10,7 @@ from pithy.json_utils import out_jsonl
 from pithy.type_util import is_str
 from parsing import clean_word_token_re, word_re, entity_replacements, parser
 
+
 scans = muck.load('wb/scan.jsons')
 stopwords = set(muck.load('stopwords.json'))
 
@@ -17,19 +18,23 @@ stopwords = set(muck.load('stopwords.json'))
 # Words and definitions have a many-to-many relationship.
 # One word can be defined multiple times;
 # Multiple words can be defined in a single record.
-# A single 'word' being defined might be multiple tokens; for now we just split them apart.
+# A single 'word' being defined might be multiple tokens.
 # For multiple words sharing a definition, the first is treated as the canonical 'base' word.
 WordDefns = namedtuple('WordDefns', 'base words defns')
 
 word_bases = {} # Maps each word to its base, which may be itself.
 
-bases = DefaultByKeyDict(lambda base: WordDefns(base, set(), set()))
+base_worddefns = DefaultByKeyDict(lambda base: WordDefns(base, set(), set()))
 
+
+space_re = re.compile(r'\s+')
 
 def clean_hw_word(tree):
   'Join together word tokens after omitting the pronunciation tokens.'
   tokens = [el for el in tree.walk_contents() if clean_word_token_re.fullmatch(el)]
-  return ''.join(tokens).strip().lower()
+  s = ''.join(tokens).strip().lower()
+  return space_re.sub(' ', s) # regularize multiple spaces just in case.
+
 
 def clean_defn_words(tree):
   for el in tree.walk_contents():
@@ -69,12 +74,12 @@ for record in err_progress(scans):
   assert words
   # the first word is the base, unless a base already exists from a previous record.
   base = word_bases.setdefault(words[0], words[0])
-  word_defns = bases[base]
+  word_defns = base_worddefns[base]
   word_defns.words.update(words)
   word_defns.defns.update(defns)
 
 errFL('bases: {}; words: {}; multiwords (keys containing spaces): {}',
-  len(bases), len(word_bases), multiword_count)
+  len(base_worddefns), len(word_bases), multiword_count)
 
-for base in bases.values():
-  out_jsonl(base)
+for worddefn in base_worddefns.values():
+  out_jsonl(worddefn)
