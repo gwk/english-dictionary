@@ -1,15 +1,13 @@
 # Analyze the largest strongly connected component.
 
 import muck
-import re
 
 from collections import defaultdict
 from operator import itemgetter
 from pithy.io import *
-from pithy.json_utils import out_jsonl
 from networkx import DiGraph, hits as calc_hits
 
-from graphs import load_graph
+import graphs # registers .graph loader.
 
 
 max_scc = muck.load('wb/word-sets-max-scc.graph')
