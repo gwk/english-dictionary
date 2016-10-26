@@ -1,11 +1,13 @@
+writeup v0
+
 # Motivation
 
 This is a toy data science project intended to test Muck, a build tool for data analysis (see http://github.com/gwk/muck). I chose it mostly to satisfy a longstanding curiosity about the nature English dictionaries: what is the subset of words in the dictionary that are circularly defined? I do not yet have an answer; the data has been much more difficult to work with than I originally anticipated!
 
 I started with the Project Gutenberg version of Webster's Unabridged Dictionary, which I first learned about from James Somers' blog (http://jsomers.net/blog/dictionary). I chose this text as a starting point for several reasons:
-- it is in the public domain;
-- Somers promoted it as being more interesting than modern dictionaries;
-- the raw text presents several non-trivial data cleaning challenges.
+* it is in the public domain;
+* Somers promoted it as being more interesting than modern dictionaries;
+* the raw text presents several non-trivial data cleaning challenges.
 
 
 # Sources
@@ -24,15 +26,15 @@ I am thankful for the past efforts of everyone involved in the digitization and 
 # Terminology
 
 For clarity, I came up with a few terms for clarity in the code and documentation:
-- 'aggregate text': the catenation of the original texts, omitting the documentation comments at the top of each file.
-- 'raw line': a line of text from the original document, which has line breaks inserted to wrap at 78 characters (typical of older text produced for viewing on 80 character terminals).
-- 'paragraph line', 'line': a line of text created grouping and joining one or more raw lines. Performing this grouping is the first major challenge to parsing the text; using the original SGML made it much easier, because the paragraphs are tagged.
-- 'record': conceptually, the basic unit of data within the dictionary, consisting of multiple paragraphs, which collectively contain one or more 'names', 'technical info', and 'definitions'. Note that there are many entries with multiple or non-unique names in the Webster's text.
-- 'name': within a record, the name is the word being defined.
-- 'technical info', 'tech': the information in a record immediately following the name, including the pronunciation, part of speech, etymology, and topic information. This information is not always present, and is difficult to separate from the subsequent definition information.
-- 'definition', 'defn': roughly, the text providing definitions of the word in the record, following the technical info.
-- 'scan': the first major transformation step, grouping the paragraph lines into logical records based on the presence of `<hw>` tags, which indicate a word being defined.
-- 'parse': the process of converting a SGML-tagged paragraph line into a tree structure.
+* 'aggregate text': the catenation of the original texts, omitting the documentation comments at the top of each file.
+* 'raw line': a line of text from the original document, which has line breaks inserted to wrap at 78 characters (typical of older text produced for viewing on 80 character terminals).
+* 'paragraph line', 'line': a line of text created grouping and joining one or more raw lines. Performing this grouping is the first major challenge to parsing the text; using the original SGML made it much easier, because the paragraphs are tagged.
+* 'record': conceptually, the basic unit of data within the dictionary, consisting of multiple paragraphs, which collectively contain one or more 'names', 'technical info', and 'definitions'. Note that there are many entries with multiple or non-unique names in the Webster's text.
+* 'name': within a record, the name is the word being defined.
+* 'technical info', 'tech': the information in a record immediately following the name, including the pronunciation, part of speech, etymology, and topic information. This information is not always present, and is difficult to separate from the subsequent definition information.
+* 'definition', 'defn': roughly, the text providing definitions of the word in the record, following the technical info.
+* 'scan': the first major transformation step, grouping the paragraph lines into logical records based on the presence of `<hw>` tags, which indicate a word being defined.
+* 'parse': the process of converting a SGML-tagged paragraph line into a tree structure.
 
 
 # Experience
@@ -40,10 +42,10 @@ For clarity, I came up with a few terms for clarity in the code and documentatio
 Parsing the dictionary accurately has proven to be very challenging. My first approach (with the #29765 utf8 text) was to build a line-by-line parser using explicit state transitions. This proved unsuccessful; for every assumption that I made I eventually encountered a counterexample, and I became concerned that no matter how careful I was, mistakes in the parser design could lose information silently. For example, early versions aggregated entries with identical names, and collapsed multiple entries with matching pronunciation lines; this made the high level structure more complex, and lost the distinction made by those separate entries. When I discovered the SGML texts, I abandoned this approach and decided to take a more careful, incremental approach.
 
 Even with the structured SGML sources, there are typos and inconsistencies that require a variety of corrective steps. The transformations are made incrementally, in the hope that they will be more understandable and auditable, and ultimately correct. Rather than apply corrections blindly in scripts, which might introduce errors or oversimplifications, I used the following method:
-- write code that checks for some presumed structure or rule (an 'invariant') in the text.
-- if the check succeeds in all cases, then rely on that invariant to programmatically transform the data or otherwise proceed.
-- if the rule fails in just a few places, and the failures look like transcription errors or other technical inconsistencies, then add a dedicated patch file to fix those outliers. 
-- otherwise, revise the invariant.
+* write code that checks for some presumed structure or rule (an 'invariant') in the text.
+* if the check succeeds in all cases, then rely on that invariant to programmatically transform the data or otherwise proceed.
+* if the rule fails in just a few places, and the failures look like transcription errors or other technical inconsistencies, then add a dedicated patch file to fix those outliers.
+* otherwise, revise the invariant.
 
 In this way, I have accumulated several patch files, each of which makes specific changes to improve a certain aspect of the text. I hope that these can be reviewed without too much trouble. Although the flaws were discovered at various stages in the pipeline, all of the patching is performed on the aggregate text. This makes the project structure simpler, and also makes it easier for anyone to apply the patches to the original sources (to make this automatic the patches would need to be rewritten to apply to the original eleven texts, and not the aggregate; I will support this effort if Project Gutenberg or somebody else expresses interest).
 
@@ -68,12 +70,12 @@ The SGML contains many nonstandard entity sequences; I have attempted to build a
 ## Parse
 
 Rather than use an HTML parser like Beautiful Soup, I wrote a custom parser to convert the SGML text into parse trees. The custom parser has some particular advantages:
-- Lossless parse trees: the tuples can be joined to recover the original text exactly (by default, entities are not replaced).
-- Integrated lexing of the text within the tags, which is convenient for the consumers of the parse trees.
-- Integrated parsing of non-SGML nesting structure, particularly parentheses, brackets, and braces.
-- Precise reporting of flaws in the nesting structure of the text, which aids checking for correctness.
-- Pretty printing of flaws (using ANSI terminal coloring), which helped speed up the patching process.
-- Simple but effective heuristic for continuing parsing after a flaw is encountered.
+* Lossless parse trees: the tuples can be joined to recover the original text exactly (by default, entities are not replaced).
+* Integrated lexing of the text within the tags, which is convenient for the consumers of the parse trees.
+* Integrated parsing of non-SGML nesting structure, particularly parentheses, brackets, and braces.
+* Precise reporting of flaws in the nesting structure of the text, which aids checking for correctness.
+* Pretty printing of flaws (using ANSI terminal coloring), which helped speed up the patching process.
+* Simple but effective heuristic for continuing parsing after a flaw is encountered.
 
 ## Names
 
@@ -86,10 +88,10 @@ TODO.
 ## Semantics
 
 Early on I became fascinated with trying to parse the technical information. It's an interesting problem for several reasons:
-- Despite appearing fairly structured, the technical lines have structural inconsistencies.
-- Additionally, there are typos in some lines.
-- Some of the abbreviations are not consistent (e.g. 'from' and 'fr.'), making classification of the various parts challenging.
-- Some of the lines are not so easy for a human (or at least me) to read!
+* Despite appearing fairly structured, the technical lines have structural inconsistencies.
+* Additionally, there are typos in some lines.
+* Some of the abbreviations are not consistent (e.g. 'from' and 'fr.'), making classification of the various parts challenging.
+* Some of the lines are not so easy for a human (or at least me) to read!
 
 So far, I have not succeeded! If anyone has suggestions as to how to approach this, I'd love to hear them. This sort of text input is halfway between rigid machine text and natural language, and I wonder how well NLP techniques apply to the problem.
 
