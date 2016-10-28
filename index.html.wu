@@ -5,6 +5,7 @@ writeup v0
 This project analyzes the text of the Webster's Dictionary 1912 Edition.
 
 
-Strongly Connected Component Sizes:
+## Strongly Connected Component Info
+
 <embed: wb/word-sets-scc-sizes.csv>
 
