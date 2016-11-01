@@ -1,4 +1,4 @@
-# Generate basic data mapping defined words to defining word sets.
+# Word sets graph with obvious per-record cycles removed.
 
 import muck
 
@@ -8,8 +8,9 @@ from pithy.json_utils import out_jsonl
 word_sets = muck.load('wb/word-sets.jsonl')
 
 for record in word_sets:
-  base, words, defns = record
-  out_jsonl([base] + defns)
+  base, words, all_defns = record
+  defns = set(all_defns) - {base} - set(words)
+  out_jsonl([base] + sorted(defns))
   # for now, simply link additional words to base.
   for word in words:
     if word != base:
