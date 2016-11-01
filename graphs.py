@@ -1,6 +1,7 @@
 # Graph utilities..
 
 import muck
+from operator import itemgetter
 from pithy.json_utils import load_jsonl, out_jsonl
 from networkx import DiGraph
 
@@ -27,4 +28,11 @@ def subgraph(graph, nodes, include_outgoing=True):
   for src, dst_seq in graph.adjacency_iter():
     sg.add_edges_from((src, dst) for dst in dst_seq if src in nodes and include_outgoing or dst in nodes)
   return sg
+
+
+def items_by_score(d, reverse=True):
+  return sorted(d.items(), key=itemgetter(1), reverse=reverse)
+
+def nodes_by_score(d, reverse=True):
+  return [node for node, score in items_by_score(d, reverse)]
 

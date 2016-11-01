@@ -3,23 +3,15 @@
 import muck
 
 from collections import defaultdict
-from operator import itemgetter
 from pithy.io import *
 from networkx import DiGraph, hits as calc_hits
 
-import graphs # registers .graph loader.
+from graphs import * # registers .graph loader.
 
 
 max_scc = muck.load('wb/word-sets-max-scc.graph')
 
 outFL('max_scc nodes: {}; edges: {}', max_scc.number_of_nodes(), max_scc.number_of_edges())
-
-def items_by_score(d, reverse=True):
-  return sorted(d.items(), key=itemgetter(1), reverse=reverse)
-
-def nodes_by_score(d, reverse=True):
-  return [node for node, score in items_by_score(d, reverse)]
-
 
 def node_degree_ranks(degrees):
   degs_to_nodes = defaultdict(set)
