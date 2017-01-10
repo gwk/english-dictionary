@@ -7,7 +7,7 @@ import re
 from itertools import chain, islice
 
 from pithy.ansi import RST_TXT, TXT_M, TXT_R
-from pithy.seq import IterBuffer
+from pithy.buffer import Buffer
 from pithy.tag_parse import TagRule, TagParser
 from pithy.type_util import is_str
 
