@@ -10,8 +10,8 @@ from pithy.json import out_jsonl
 from pithy.loader import load
 
 
-graph = load('wb/word-sets-graph.graph')
-errL(f'word-sets-graph: nodes: {graph.number_of_nodes()}; edges: {graph.number_of_edges()}')
+graph = load('wb/word-sets.graph')
+errL(f'word-sets: nodes: {graph.number_of_nodes()}; edges: {graph.number_of_edges()}')
 
 sccs = list(calc_sccs(graph))
 

@@ -5,9 +5,9 @@ from pithy.json import out_jsonl
 from pithy.loader import load
 
 
-graph = load('wb/word-sets-graph.graph')
+graph = load('wb/word-sets.graph')
 
-in_degs = graph.in_degree()
+out_degs = graph.out_degree()
 
-for p in items_by_score(in_degs):
+for p in items_by_score(out_degs):
   out_jsonl(p)

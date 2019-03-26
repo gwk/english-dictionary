@@ -12,7 +12,7 @@ from pithy.io import errL, errSL
 from pithy.loader import load
 
 
-graph = load('wb/word-sets-graph.graph')
+graph = load('wb/word-sets.graph')
 
 sccs = list(calc_sccs(graph))
 errL(f'sccs: {len(sccs)}')
