@@ -2,9 +2,11 @@
 # Use the original MICRA v0.50 sources hosted at Project Gutenberg;
 # The other versions on Project Gutenberg have been post-processed and seem to have lost some fidelity.
 
-import muck
-from string import digits, ascii_letters, punctuation
-from pithy.io import errFL, err_progress, outZ
+from string import ascii_letters, digits, punctuation
+
+from pithy.fetch import load_url
+from pithy.io import err_progress, errL, outZ
+
 
 sources = [
   (660, 'ab'),
@@ -23,16 +25,16 @@ sources = [
 clean_chars = set(digits + ascii_letters + punctuation + ' \n')
 
 for ebook_num, letters in sources:
-  url = 'http://www.gutenberg.org/files/{}/old/pgw050{}.txt'.format(ebook_num, letters)
-  file = muck.load_url(url, delay=1, encoding='latin_1')
+  url = f'http://www.gutenberg.org/files/{ebook_num}/old/pgw050{letters}.txt'
+  file = load_url(url, delay=1, encoding='latin_1')
 
   # skip the header.
   for i, line in enumerate(file):
     if line == '!>\n':
-      errFL('{}: lines skipped: {}', letters, i)
+      errL(f'{letters}: lines skipped: {i}')
       break
 
   for line in err_progress(file, letters + ': lines scanned'):
     if not all(c in clean_chars for c in line):
-      failFL('unclean line: {!r}', line)
+      exit(f'unclean line: {line!r}')
     outZ(line)

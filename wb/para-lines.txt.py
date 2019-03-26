@@ -1,12 +1,12 @@
 # Parse the aggregated gutenberg text by coalesting top-level <p> blocks into single lines.
 
-import muck
 import re
 
-from pithy.io import outL
+from pithy.io import errL, outL
+from pithy.loader import load
 
 
-text = muck.load('wb/raw-lines.txt')
+text = load('wb/raw-lines.txt')
 
 
 def is_leading_space_ok(line):
@@ -23,10 +23,9 @@ ws_re = re.compile(r'\s')
 
 for i, line in enumerate(text, 1):
 
-  def checkF(cond, fmt, *items):
+  def checkF(cond:bool, msg:str):
     if cond: return
-    errF('{:>6}: ' + fmt, i, *items)
-    errL('; ', repr(line))
+    errL(f'{i:>6}: {msg}; {line!r}')
 
   assert line.endswith('\n')
 

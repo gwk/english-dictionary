@@ -1,12 +1,13 @@
 # Fix up the patched aggregate text, producing the final raw lines.
 
-import muck
 import re
 
 from pithy.io import outZ
+from pithy.loader import load
+from pithy.transform import Transformer
 
 
-with muck.transform('wb/p-misc.txt') as t:
+with Transformer(load('wb/p-misc.txt'), log_stem='raw-lines.txt') as t:
 
   @t.drop
   def alphabet_headers(line):

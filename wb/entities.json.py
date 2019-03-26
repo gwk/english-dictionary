@@ -8,21 +8,21 @@
 
 
 import html.entities as std_entities
-import muck
 import unicodedata
 
-from pithy.io import *
-from pithy.json_utils import out_json
-from pithy.string_utils import clip_suffix
+from pithy.io import errL, errSL
+from pithy.json import out_json
+from pithy.loader import load
+from pithy.string import clip_suffix
 
 
 # this dictionary was transcribed from the micra webfont.txt documentation file.
 # it served as the hints with which some entities below were created by hand.
 micra_webfont_entity_descriptions = { k.strip(' *</') : v for (k, v) in \
-  muck.load('wb/micra-webfont-entities.json').items() }
+  load('wb/micra-webfont-entities.json').items() }
 
 # all the found entities.
-entities = [line.strip() for line in muck.load('wb/entities.txt')]
+entities = [line.strip() for line in load('wb/entities.txt')]
 
 # the html5 entities dictionary has some keys without semicolons;
 # ignore these (overly loose / modern for our purposes),
@@ -156,20 +156,19 @@ def get_trans(e):
 
   c = ent_html5.get(e)
   if c:
-    #errFL('html5: {} -> {}{}', e, c, '' if e in ent_xhtml else '  (not xhtml)')
+    #errL(f'html5: {e} -> {c}', '' if e in ent_xhtml else '  (not xhtml)')
     return c
 
   c =guess_trans(e)
   if c: return c
 
-  errFL('unknown entity: {}', e)
+  errL(f'unknown entity: {e}')
   d = micra_webfont_entity_descriptions.get(e)
-  if d: errFL('micra webfont note: {}', d)
+  if d: errL(f'micra webfont note: {d}')
 
-  return '«{}»'.format(e)
+  return f'«{e}»'
 
 # prefer composed characters over combining sequences.
-trans = { '&{};'.format(e) : unicodedata.normalize('NFC', get_trans(e)) for e in entities }
+trans = { f'&{e};' : unicodedata.normalize('NFC', get_trans(e)) for e in entities }
 
 out_json(trans)
-

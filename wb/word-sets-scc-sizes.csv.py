@@ -1,21 +1,22 @@
 # Analyze the largest strongly connected component.
 
-import muck
-
 from collections import Counter
 from operator import itemgetter
-from pithy.io import *
-from pithy.csv_utils import write_csv
+from os import environ
+
 from networkx import strongly_connected_components as calc_sccs
 
-import graphs # registers .graph loader.
+import graphs  # Registers '.graph' loader.
+from pithy.csv import out_csv
+from pithy.io import errL, errSL
+from pithy.loader import load
 
-graph = muck.load('wb/word-sets-graph.graph')
+
+graph = load('wb/word-sets-graph.graph')
 
 sccs = list(calc_sccs(graph))
-errFL('sccs: {}', len(sccs))
+errL(f'sccs: {len(sccs)}')
 
 hist = Counter(len(scc) for scc in sccs)
 
-write_csv(stdout, ('SCC Size', 'Count'), sorted(hist.items(), reverse=True))
-
+out_csv(header=('SCC Size', 'Count'), rows=sorted(hist.items(), reverse=True))

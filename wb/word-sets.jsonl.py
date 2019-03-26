@@ -1,18 +1,18 @@
 # Generate basic data mapping defined words to defining word sets.
 
-import muck
 import re
-
 from collections import namedtuple
-from pithy.dict_utils import DefaultByKeyDict
+
+from parsing import clean_word_token_re, entity_replacements, parser, word_re
+from pithy.dict import DefaultByKeyDict
 from pithy.io import *
-from pithy.json_utils import out_jsonl
-from pithy.type_util import is_str
-from parsing import clean_word_token_re, word_re, entity_replacements, parser
+from pithy.json import out_jsonl
+from pithy.loader import load
+from stopwords import stopwords
 
 
-scans = muck.load('wb/scan.jsons')
-stopwords = set(muck.load('stopwords.json'))
+scans = load('wb/scan.jsons')
+
 
 
 # Words and definitions have a many-to-many relationship.
@@ -52,7 +52,7 @@ for record in err_progress(scans):
 
   def digest_tree(tree):
     global multiword_count
-    if is_str(tree):
+    if isinstance(tree, str):
       other.add(tree)
       return
     tag = tree[0]
@@ -78,8 +78,7 @@ for record in err_progress(scans):
   word_defns.words.update(words)
   word_defns.defns.update(defns)
 
-errFL('bases: {}; words: {}; multiwords (keys containing spaces): {}',
-  len(base_worddefns), len(word_bases), multiword_count)
+errL(f'bases: {len(base_worddefns)}; words: {len(word_bases)}; multiwords (keys containing spaces): {multiword_count}')
 
 for worddefn in base_worddefns.values():
   out_jsonl(worddefn)

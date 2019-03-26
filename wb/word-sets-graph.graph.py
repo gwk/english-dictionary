@@ -1,11 +1,11 @@
 # Word sets graph with obvious per-record cycles removed.
 
-import muck
-
 from pithy.io import *
-from pithy.json_utils import out_jsonl
+from pithy.json import out_jsonl
+from pithy.loader import load
 
-word_sets = muck.load('wb/word-sets.jsonl')
+
+word_sets = load('wb/word-sets.jsonl')
 
 for record in word_sets:
   base, words, all_defns = record

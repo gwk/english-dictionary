@@ -1,12 +1,11 @@
 # Generate list of nodes sorted by in degree.
 
-import muck
-
-from pithy.json_utils import out_jsonl
 from graphs import items_by_score
+from pithy.json import out_jsonl
+from pithy.loader import load
 
 
-graph = muck.load('wb/word-sets-graph.graph')
+graph = load('wb/word-sets-graph.graph')
 
 in_degs = graph.in_degree()
 

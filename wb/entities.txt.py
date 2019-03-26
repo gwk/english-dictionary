@@ -10,18 +10,18 @@
 # this syntax is not present in the 0.50 texts, as shown by the assertion;
 # presumably they were converted to entity syntax.
 
-import muck
 import re
 
-from pithy.io import checkF, outL
+from pithy.io import outL
+from pithy.loader import load
 
 
-text = muck.load('wb/raw-lines.txt')
+text = load('wb/raw-lines.txt')
 
 entities = set()
 
 for i, line in enumerate(text):
-  checkF(not re.search(r'<[^/>]+/', line), 'weird escape syntax: {!r}', line)
+  if re.search(r'<[^/>]+/', line): exit(f'weird escape syntax: {line!r}')
   for m in re.finditer(r'&([^;\s]*);', line):
     e = m.group(1)
     entities.add(e)

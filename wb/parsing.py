@@ -1,18 +1,16 @@
 # SGML parser using TagParser.
 # It lexes entities and whitespace while preserving the original data exactly.
 
-import muck
 import re
-
 from itertools import chain, islice
 
 from pithy.ansi import RST_TXT, TXT_M, TXT_R
 from pithy.buffer import Buffer
-from pithy.tag_parse import TagRule, TagParser
-from pithy.type_util import is_str
+from pithy.loader import load
+from pithy.tag_parse import TagParser, TagRule, TagTree
 
 
-entity_replacements = muck.load('wb/entities.json')
+entity_replacements = load('wb/entities.json')
 
 space_pattern = r'\s+'
 word_pattern = r"[-'\w]+"
