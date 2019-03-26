@@ -9,8 +9,5 @@ __pycache__/
 
 # Project.
 _build/
-_misc/
-gh-pages/
-
-# Muck.
 _fetch/
+_misc/
